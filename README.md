@@ -4,7 +4,7 @@
 
 A user describes their situation in plain language ("Main 25 saal ka hoon, rehri lagata hoon, loan milega?"). The agent asks for any missing details (age, occupation, income), searches a curated scheme database, and answers with the relevant schemes and their **official source links**.
 
-> **Live demo:** _coming soon (Render)_
+> **Live demo:** https://yojana-saathi-fb30.onrender.com
 > **Note:** the free hosting tier sleeps when idle, so the first load can take about a minute.
 
 <!-- Add a screenshot or GIF here: ![YojanaSaathi demo](docs/demo.gif) -->
