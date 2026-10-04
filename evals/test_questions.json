@@ -1,0 +1,22 @@
+[
+  {"id": 1, "question": "Meri umar 35 saal hai, main kisan hoon, saal ki income 1.5 lakh hai. Mujhe kaunsi yojana milegi?", "expected": ["PM-Kisan Samman Nidhi"], "acceptable": ["Kisan Credit Card (KCC)", "PM Fasal Bima Yojana (PMFBY)", "PM Jan Dhan Yojana"]},
+  {"id": 2, "question": "Meri umar 40 saal hai, kisan hoon, income 2 lakh. Fasal kharab ho gayi, kya madad milegi?", "expected": ["PM Fasal Bima Yojana (PMFBY)"], "acceptable": ["Kisan Credit Card (KCC)", "PM-Kisan Samman Nidhi"]},
+  {"id": 3, "question": "Main 45 saal ka kisan hoon, income 2 lakh. Kheti ke liye sasta loan chahiye.", "expected": ["Kisan Credit Card (KCC)"], "acceptable": ["PM-Kisan Samman Nidhi", "PM Fasal Bima Yojana (PMFBY)", "PM Mudra Yojana"]},
+  {"id": 4, "question": "Meri umar 25 hai, rehri lagata hoon, income 2 lakh. Loan milega?", "expected": ["PM SVANidhi (Rehri-Patri Loan)"], "acceptable": ["PM Mudra Yojana", "e-Shram Card", "PM Jan Dhan Yojana"]},
+  {"id": 5, "question": "Meri umar 30 saal hai, chhoti dukaan chalata hoon, income 3 lakh. Business ke liye bina guarantee loan chahiye.", "expected": ["PM Mudra Yojana"], "acceptable": ["PM SVANidhi (Rehri-Patri Loan)", "Stand-Up India"]},
+  {"id": 6, "question": "Meri beti 5 saal ki hai, main 32 saal ka mazdoor hoon, income 1 lakh. Beti ke liye bachat yojana batao.", "expected": ["Sukanya Samriddhi Yojana"], "acceptable": ["PM Jan Dhan Yojana"]},
+  {"id": 7, "question": "Main 28 saal ka mazdoor hoon, income 1.2 lakh. Budhape ki pension yojana batao.", "expected": ["Atal Pension Yojana (APY)"], "acceptable": ["e-Shram Card", "PM Jan Dhan Yojana"]},
+  {"id": 8, "question": "Main 30 saal ka construction mazdoor hoon, income 1.5 lakh. Accident insurance milega?", "expected": ["e-Shram Card"], "acceptable": ["PM Jan Dhan Yojana", "Atal Pension Yojana (APY)"]},
+  {"id": 9, "question": "Main 38 saal ka badhai (carpenter) hoon, income 1.8 lakh. Auzaar aur training ke liye koi yojana?", "expected": ["PM Vishwakarma Yojana"], "acceptable": ["PM Mudra Yojana"]},
+  {"id": 10, "question": "Main 22 saal ka student hoon, SC category, parivaar ki income 2 lakh. Scholarship milegi?", "expected": ["National Scholarship Portal (NSP) Scholarships"], "acceptable": []},
+  {"id": 11, "question": "Meri umar 50 saal hai, mazdoor hoon, income 1 lakh. Muft ilaaj ke liye 5 lakh ka health cover chahiye.", "expected": ["Ayushman Bharat PM-JAY"], "acceptable": ["PM Jan Dhan Yojana", "e-Shram Card"]},
+   {"id": 12, "question": "Main 34 saal ki mahila hoon, gharelu kaam karti hoon, ghar mein LPG cylinder nahi hai, income 1 lakh. Muft gas connection milega?", "expected": ["PM Ujjwala Yojana"], "acceptable": ["PM Jan Dhan Yojana"]},
+  {"id": 13, "question": "Meri umar 42 saal hai, kaccha ghar hai, mazdoor hoon, income 1.2 lakh. Pakka ghar banane mein madad chahiye.", "expected": ["PM Awas Yojana (PMAY)"], "acceptable": []},
+    {"id": 14, "question": "Main 29 saal ki SC mahila hoon, abhi ghar par kaam karti hoon, naya business shuru karna hai, income 2 lakh. 20 lakh ka loan chahiye.", "expected": ["Stand-Up India"], "acceptable": ["PM Mudra Yojana"]},
+  {"id": 15, "question": "Meri umar 27 hai, mazdoor hoon, income 1 lakh. Mera bank account nahi hai, zero balance khata kaise khulega?", "expected": ["PM Jan Dhan Yojana"], "acceptable": []},
+  {"id": 16, "question": "Main 33 saal ki mahila hoon, tailor hoon, income 1.5 lakh. Silai ke kaam ke liye koi yojana?", "expected": ["PM Vishwakarma Yojana"], "acceptable": ["PM Mudra Yojana", "e-Shram Card"]},
+  {"id": 17, "question": "Main 26 saal ka street vendor hoon, sabzi bechta hoon, income 1.5 lakh. Digital payment pe cashback ya byaaj subsidy milegi?", "expected": ["PM SVANidhi (Rehri-Patri Loan)"], "acceptable": []},
+  {"id": 18, "question": "Bitcoin mein paisa kaise lagayein?", "expected": [], "acceptable": []},
+  {"id": 19, "question": "Aaj ka mausam kaisa hai?", "expected": [], "acceptable": []},
+  {"id": 20, "question": "Mujhe Mumbai se Delhi ki train ticket book karni hai.", "expected": [], "acceptable": []}
+]

@@ -1,0 +1,3159 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>YojanaSaathi | Sarkari Yojana Assistant</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: [
+                            "DM Sans",
+                            "Mukta",
+                            "Noto Sans",
+                            "sans-serif"
+                        ],
+                    },
+
+                    colors: {
+                        navy: {
+                            50: "#eef5fb",
+                            100: "#dcebf6",
+                            200: "#bdd6e8",
+                            500: "#17679d",
+                            600: "#125580",
+                            700: "#10466b",
+                            800: "#0d3855",
+                            900: "#092b42",
+                        },
+
+                        saffron: "#f28c28",
+                        success: "#18843b",
+                    },
+
+                    boxShadow: {
+                        soft: "0 8px 30px rgba(9,43,66,.07)",
+                        card: "0 3px 14px rgba(9,43,66,.06)",
+                    },
+
+                    borderRadius: {
+                        civic: "14px",
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- =====================================================
+         CUSTOM CSS
+         ===================================================== -->
+
+    <style>
+
+        :root {
+            --navy: #092b42;
+            --navy-2: #10466b;
+            --blue: #17679d;
+            --saffron: #f28c28;
+            --green: #18843b;
+
+            --page: #f5f8fb;
+            --surface: #ffffff;
+            --border: #dfe7ee;
+
+            --text: #172431;
+            --muted: #687887;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--page);
+            color: var(--text);
+            font-family:
+                "DM Sans",
+                "Mukta",
+                "Noto Sans",
+                sans-serif;
+        }
+
+        /* -----------------------------------------------------
+           Accessibility
+        ----------------------------------------------------- */
+
+        :focus-visible {
+            outline: 3px solid rgba(242, 140, 40, .45);
+            outline-offset: 3px;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        /* -----------------------------------------------------
+           Tricolor
+        ----------------------------------------------------- */
+
+        .tricolor {
+            height: 4px;
+
+            background:
+                linear-gradient(
+                    to right,
+                    #f28c28 0%,
+                    #f28c28 33.33%,
+                    #ffffff 33.33%,
+                    #ffffff 66.66%,
+                    #18843b 66.66%,
+                    #18843b 100%
+                );
+        }
+
+        /* -----------------------------------------------------
+           Animations
+        ----------------------------------------------------- */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeUp .35s ease-out both;
+        }
+
+        .message-in {
+            animation: fadeUp .25s ease-out both;
+        }
+
+        @keyframes typing {
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: .35;
+            }
+
+            30% {
+                transform: translateY(-4px);
+                opacity: 1;
+            }
+        }
+
+        .typing-dot {
+            animation: typing 1.1s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: .15s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: .30s;
+        }
+
+        /* -----------------------------------------------------
+           Hero
+        ----------------------------------------------------- */
+
+        .hero-pattern {
+            background:
+                radial-gradient(
+                    circle at 90% 20%,
+                    rgba(255,255,255,.10) 0,
+                    rgba(255,255,255,0) 34%
+                ),
+                linear-gradient(
+                    125deg,
+                    #092b42,
+                    #10466b
+                );
+        }
+
+        /* -----------------------------------------------------
+           Cards
+        ----------------------------------------------------- */
+
+        .civic-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+
+            transition:
+                transform .18s ease,
+                box-shadow .18s ease,
+                border-color .18s ease;
+        }
+
+        .civic-card:hover {
+            transform: translateY(-3px);
+            border-color: #c7d9e6;
+            box-shadow:
+                0 10px 28px rgba(9,43,66,.09);
+        }
+
+        /* -----------------------------------------------------
+           Chat
+        ----------------------------------------------------- */
+
+        #chatMessages {
+            min-height: 120px;
+            max-height: 650px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .chat-user {
+            background: var(--navy);
+            color: #ffffff;
+            border-radius:
+                18px
+                18px
+                5px
+                18px;
+        }
+
+        .chat-bot {
+            background: #ffffff;
+            color: var(--text);
+            border: 1px solid var(--border);
+
+            border-radius:
+                18px
+                18px
+                18px
+                5px;
+        }
+
+        .source-chip {
+            transition:
+                background .15s ease,
+                border-color .15s ease,
+                transform .15s ease;
+        }
+
+        .source-chip:hover {
+            background: #eaf4fb;
+            border-color: #b9d1e2;
+            transform: translateY(-1px);
+        }
+
+        /* -----------------------------------------------------
+           Sticky mobile input
+        ----------------------------------------------------- */
+
+        @media (max-width: 767px) {
+
+            #chatMessages {
+                max-height: 55vh;
+            }
+
+            .mobile-chat-bar {
+                position: sticky;
+                bottom: 8px;
+                z-index: 40;
+
+                padding: 7px;
+
+                background: rgba(245,248,251,.94);
+                backdrop-filter: blur(10px);
+            }
+        }
+
+        /* -----------------------------------------------------
+           Reduced motion
+        ----------------------------------------------------- */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+    <div class="bg-white border-b border-slate-200">
+
+        <div
+            class="
+                max-w-7xl
+                mx-auto
+                px-4
+                sm:px-6
+                lg:px-8
+                h-9
+                flex
+                items-center
+                justify-between
+                text-[11px]
+                text-slate-500
+            "
+        >
+
+            <div>
+                <span class="font-semibold text-slate-700">
+                    🇮🇳 Citizen Services
+                </span>
+
+                <span class="hidden sm:inline">
+                    &nbsp;•&nbsp; Sarkari Yojana Information
+                </span>
+            </div>
+
+            <div class="hidden sm:block">
+                Hindi&nbsp; | &nbsp;English
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRICOLOR -->
+
+    <div class="tricolor"></div>
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="bg-white border-b border-slate-200">
+
+        <div
+            class="
+                max-w-7xl
+                mx-auto
+                px-4
+                sm:px-6
+                lg:px-8
+                py-4
+                flex
+                items-center
+                justify-between
+                gap-4
+            "
+        >
+
+            <div class="flex items-center gap-3">
+
+                <div
+                    class="
+                        w-11
+                        h-11
+                        sm:w-12
+                        sm:h-12
+                        rounded-full
+                        border
+                        border-slate-200
+                        bg-slate-50
+                        flex
+                        items-center
+                        justify-center
+                        text-xl
+                    "
+                    aria-hidden="true"
+                >
+                    🇮🇳
+                </div>
+
+                <div>
+
+                    <h1
+                        class="
+                            text-xl
+                            sm:text-2xl
+                            font-bold
+                            tracking-tight
+                            text-navy-900
+                        "
+                    >
+                        YojanaSaathi
+                    </h1>
+
+                    <p
+                        class="
+                            text-[10px]
+                            sm:text-xs
+                            text-slate-500
+                            mt-0.5
+                        "
+                    >
+                        Sarkari Yojana Information Assistant
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="
+                    hidden
+                    md:flex
+                    items-center
+                    gap-2
+                    text-xs
+                    text-slate-500
+                "
+            >
+
+                <span
+                    class="
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-slate-50
+                        border
+                        border-slate-200
+                    "
+                >
+                    Citizen First
+                </span>
+
+                <span
+                    class="
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-navy-50
+                        text-navy-700
+                    "
+                >
+                    AI Assistant
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main
+        class="
+            max-w-7xl
+            mx-auto
+            px-4
+            sm:px-6
+            lg:px-8
+            py-5
+            sm:py-7
+        "
+    >
+
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section
+            class="
+                hero-pattern
+                rounded-2xl
+                overflow-hidden
+                shadow-soft
+                fade-in
+            "
+        >
+
+            <div class="p-6 sm:p-10 lg:p-12">
+
+                <div
+                    class="
+                        inline-flex
+                        items-center
+                        gap-2
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-white/10
+                        border
+                        border-white/15
+                        text-white
+                        text-[11px]
+                        font-medium
+                    "
+                >
+                    <span
+                        class="
+                            w-1.5
+                            h-1.5
+                            rounded-full
+                            bg-green-400
+                        "
+                    ></span>
+
+                    Government Scheme Discovery
+                </div>
+
+
+                <h2
+                    class="
+                        mt-5
+                        text-3xl
+                        sm:text-4xl
+                        lg:text-5xl
+                        font-bold
+                        tracking-tight
+                        leading-tight
+                        text-white
+                        max-w-3xl
+                    "
+                >
+                    Aapko kaunsi sarkari
+                    yojana mil sakti hai?
+                </h2>
+
+
+                <p
+                    class="
+                        mt-4
+                        text-sm
+                        sm:text-base
+                        leading-7
+                        text-slate-200
+                        max-w-2xl
+                    "
+                >
+                    Apni situation simple Hinglish mein batayein.
+                    YojanaSaathi aapko relevant sarkari yojanaon
+                    ki information samajhne mein help karega.
+                </p>
+
+
+                <button
+                    id="heroCta"
+                    type="button"
+                    class="
+                        mt-6
+                        inline-flex
+                        items-center
+                        gap-2
+                        px-5
+                        py-3
+                        rounded-lg
+                        bg-white
+                        text-navy-900
+                        text-sm
+                        font-bold
+                        shadow
+                        hover:bg-slate-50
+                        transition
+                    "
+                    aria-label="Start asking about government schemes"
+                >
+                    Yojana ke baare mein poochiye
+
+                    <span aria-hidden="true">
+                        →
+                    </span>
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             EXAMPLE QUESTIONS
+        ================================================== -->
+
+        <section class="mt-5">
+
+            <div
+                class="
+                    flex
+                    items-center
+                    gap-2
+                    mb-3
+                "
+            >
+
+                <span
+                    class="
+                        text-sm
+                        font-bold
+                        text-navy-900
+                    "
+                >
+                    💬 Try asking
+                </span>
+
+                <span
+                    class="
+                        text-xs
+                        text-slate-500
+                    "
+                >
+                    Example questions
+                </span>
+
+            </div>
+
+
+            <div
+                id="exampleQuestions"
+                class="
+                    flex
+                    flex-wrap
+                    gap-2
+                "
+            >
+
+                <button
+                    type="button"
+                    class="example-chip"
+                    data-question="Mujhe kaunsi yojana milegi?"
+                >
+                    Mujhe kaunsi yojana milegi?
+                </button>
+
+                <button
+                    type="button"
+                    class="example-chip"
+                    data-question="PM Mudra Yojana kya hai?"
+                >
+                    PM Mudra Yojana kya hai?
+                </button>
+
+                <button
+                    type="button"
+                    class="example-chip"
+                    data-question="Ayushman card kaise banta hai?"
+                >
+                    Ayushman card kaise banta hai?
+                </button>
+
+                <button
+                    type="button"
+                    class="example-chip"
+                    data-question="Main rehri lagata hoon, loan milega?"
+                >
+                    Main rehri lagata hoon, loan milega?
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TWO COLUMN AREA
+        ================================================== -->
+
+        <div
+            class="
+                mt-7
+                grid
+                grid-cols-1
+                lg:grid-cols-[280px_minmax(0,1fr)]
+                gap-5
+                items-start
+            "
+        >
+
+
+            <!-- =============================================
+                 SIDEBAR / PROFILE
+            ============================================== -->
+
+            <aside
+                class="
+                    order-1
+                    lg:order-1
+                    lg:sticky
+                    lg:top-4
+                "
+            >
+
+                <div
+                    class="
+                        civic-card
+                        p-5
+                        shadow-card
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-start
+                            justify-between
+                            gap-3
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    text-base
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Aapki Profile
+                            </p>
+
+                            <p
+                                class="
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Agent ko ab tak kya pata hai
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                w-9
+                                h-9
+                                rounded-lg
+                                bg-navy-50
+                                flex
+                                items-center
+                                justify-center
+                            "
+                            aria-hidden="true"
+                        >
+                            👤
+                        </div>
+
+                    </div>
+
+
+                    <!-- Progress -->
+
+                    <div class="mt-5">
+
+                        <div
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                                text-[11px]
+                            "
+                        >
+
+                            <span
+                                class="font-semibold text-slate-600"
+                            >
+                                Profile progress
+                            </span>
+
+                            <span
+                                id="profileProgressText"
+                                class="font-bold text-navy-700"
+                            >
+                                0 / 3 bhari
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                mt-2
+                                h-1.5
+                                bg-slate-100
+                                rounded-full
+                                overflow-hidden
+                            "
+                        >
+
+                            <div
+                                id="profileProgressBar"
+                                class="
+                                    h-full
+                                    bg-navy-600
+                                    rounded-full
+                                    transition-all
+                                    duration-300
+                                "
+                                style="width: 0%"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Profile fields -->
+
+                    <div
+                        id="profileFields"
+                        class="mt-5 space-y-2"
+                    ></div>
+
+
+                    <!-- Optional profile fields -->
+
+                    <div
+                        class="
+                            mt-5
+                            pt-4
+                            border-t
+                            border-slate-100
+                        "
+                    >
+
+                        <p
+                            class="
+                                text-[10px]
+                                uppercase
+                                tracking-wider
+                                font-bold
+                                text-slate-400
+                            "
+                        >
+                            Optional
+                        </p>
+
+                        <div
+                            id="optionalProfileFields"
+                            class="mt-2 space-y-2"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- New conversation -->
+
+                <button
+                    id="newChatBtn"
+                    type="button"
+                    class="
+                        w-full
+                        mt-3
+                        px-4
+                        py-3
+                        rounded-lg
+                        border
+                        border-slate-300
+                        bg-white
+                        text-navy-800
+                        text-xs
+                        font-bold
+                        hover:bg-navy-50
+                        hover:border-navy-200
+                        transition
+                        shadow-sm
+                    "
+                    aria-label="Start a new conversation"
+                >
+                    ↻ Nayi baatcheet shuru karo
+                </button>
+
+            </aside>
+
+
+            <!-- =============================================
+                 MAIN CONTENT
+            ============================================== -->
+
+            <div class="order-2">
+
+
+                <!-- =========================================
+                     CATEGORIES
+                ========================================== -->
+
+                <section>
+
+                    <div>
+
+                        <h3
+                            class="
+                                text-xl
+                                font-bold
+                                text-navy-900
+                            "
+                        >
+                            Yojana categories
+                        </h3>
+
+                        <p
+                            class="
+                                mt-1
+                                text-xs
+                                text-slate-500
+                            "
+                        >
+                            Apni zarurat ke hisaab se poochiye.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="categories"
+                        class="
+                            mt-4
+                            grid
+                            grid-cols-2
+                            sm:grid-cols-3
+                            lg:grid-cols-4
+                            gap-3
+                        "
+                    >
+
+                        <!-- Kheti -->
+
+                        <button
+                            type="button"
+                            class="
+                                civic-card
+                                category-button
+                                p-4
+                                text-left
+                            "
+                            data-question="Mujhe kheti aur farmers ke liye available sarkari yojanaon ke baare mein batao."
+                        >
+
+                            <span
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-lg
+                                    bg-green-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xl
+                                "
+                                aria-hidden="true"
+                            >
+                                👨‍🌾
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-3
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Kheti
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Farmers & agriculture
+                            </span>
+
+                        </button>
+
+
+                        <!-- Education -->
+
+                        <button
+                            type="button"
+                            class="
+                                civic-card
+                                category-button
+                                p-4
+                                text-left
+                            "
+                            data-question="Mujhe padhai aur scholarship ke liye available sarkari yojanaon ke baare mein batao."
+                        >
+
+                            <span
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-lg
+                                    bg-blue-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xl
+                                "
+                                aria-hidden="true"
+                            >
+                                🎓
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-3
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Padhai / Scholarship
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Students & scholarships
+                            </span>
+
+                        </button>
+
+
+                        <!-- Housing -->
+
+                        <button
+                            type="button"
+                            class="
+                                civic-card
+                                category-button
+                                p-4
+                                text-left
+                            "
+                            data-question="Mujhe ghar aur housing ke liye available sarkari yojanaon ke baare mein batao."
+                        >
+
+                            <span
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-lg
+                                    bg-orange-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xl
+                                "
+                                aria-hidden="true"
+                            >
+                                🏠
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-3
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Ghar
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Housing support
+                            </span>
+
+                        </button>
+
+
+                        <!-- Employment -->
+
+                        <button
+                            type="button"
+                            class="
+                                civic-card
+                                category-button
+                                p-4
+                                text-left
+                            "
+                            data-question="Mujhe rozgar, skill aur employment ke liye available sarkari yojanaon ke baare mein batao."
+                        >
+
+                            <span
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-lg
+                                    bg-purple-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xl
+                                "
+                                aria-hidden="true"
+                            >
+                                💼
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-3
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Rozgar
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Jobs & skills
+                            </span>
+
+                        </button>
+
+
+                        <!-- Money -->
+
+                        <button
+                            type="button"
+                            class="
+                                civic-card
+                                category-button
+                                p-4
+                                text-left
+                            "
+                            data-question="Mujhe bachat, paisa aur financial support ke liye available sarkari yojanaon ke baare mein batao."
+                        >
+
+                            <span
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-lg
+                                    bg-yellow-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xl
+                                "
+                                aria-hidden="true"
+                            >
+                                💰
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-3
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Bachat / Paisa
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Finance & savings
+                            </span>
+
+                        </button>
+
+
+                        <!-- Health -->
+
+                        <button
+                            type="button"
+                            class="
+                                civic-card
+                                category-button
+                                p-4
+                                text-left
+                            "
+                            data-question="Mujhe swasthya aur health ke liye available sarkari yojanaon ke baare mein batao."
+                        >
+
+                            <span
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-lg
+                                    bg-red-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xl
+                                "
+                                aria-hidden="true"
+                            >
+                                🏥
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-3
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Swasthya
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Health support
+                            </span>
+
+                        </button>
+
+
+                        <!-- Women & Child -->
+
+                        <button
+                            type="button"
+                            class="
+                                civic-card
+                                category-button
+                                p-4
+                                text-left
+                            "
+                            data-question="Mujhe mahila aur bachchon ke liye available sarkari yojanaon ke baare mein batao."
+                        >
+
+                            <span
+                                class="
+                                    w-10
+                                    h-10
+                                    rounded-lg
+                                    bg-pink-50
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xl
+                                "
+                                aria-hidden="true"
+                            >
+                                👩‍👧
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-3
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Mahila aur Bachche
+                            </span>
+
+                            <span
+                                class="
+                                    block
+                                    mt-1
+                                    text-[11px]
+                                    text-slate-500
+                                "
+                            >
+                                Women & children
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     HOW IT WORKS
+                ========================================== -->
+
+                <section class="mt-9">
+
+                    <h3
+                        class="
+                            text-xl
+                            font-bold
+                            text-navy-900
+                        "
+                    >
+                        Kaise kaam karta hai?
+                    </h3>
+
+                    <p
+                        class="
+                            mt-1
+                            text-xs
+                            text-slate-500
+                        "
+                    >
+                        YojanaSaathi aapse zaroori information
+                        step-by-step samajhta hai.
+                    </p>
+
+
+                    <div
+                        class="
+                            mt-4
+                            grid
+                            grid-cols-1
+                            sm:grid-cols-3
+                            gap-3
+                        "
+                    >
+
+                        <!-- Step 1 -->
+
+                        <div
+                            class="
+                                civic-card
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    w-9
+                                    h-9
+                                    rounded-full
+                                    bg-navy-800
+                                    text-white
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xs
+                                    font-bold
+                                "
+                            >
+                                1
+                            </div>
+
+                            <h4
+                                class="
+                                    mt-4
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Apni details batayein
+                            </h4>
+
+                            <p
+                                class="
+                                    mt-1.5
+                                    text-[11px]
+                                    leading-5
+                                    text-slate-500
+                                "
+                            >
+                                Umar, pesha aur parivaar ki
+                                saalana aay batayein.
+                            </p>
+
+                        </div>
+
+
+                        <!-- Step 2 -->
+
+                        <div
+                            class="
+                                civic-card
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    w-9
+                                    h-9
+                                    rounded-full
+                                    bg-navy-800
+                                    text-white
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xs
+                                    font-bold
+                                "
+                            >
+                                2
+                            </div>
+
+                            <h4
+                                class="
+                                    mt-4
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Yojana samjhiye
+                            </h4>
+
+                            <p
+                                class="
+                                    mt-1.5
+                                    text-[11px]
+                                    leading-5
+                                    text-slate-500
+                                "
+                            >
+                                Agent aapki situation ke hisaab
+                                se information deta hai.
+                            </p>
+
+                        </div>
+
+
+                        <!-- Step 3 -->
+
+                        <div
+                            class="
+                                civic-card
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    w-9
+                                    h-9
+                                    rounded-full
+                                    bg-navy-800
+                                    text-white
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-xs
+                                    font-bold
+                                "
+                            >
+                                3
+                            </div>
+
+                            <h4
+                                class="
+                                    mt-4
+                                    text-sm
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                Eligibility check karein
+                            </h4>
+
+                            <p
+                                class="
+                                    mt-1.5
+                                    text-[11px]
+                                    leading-5
+                                    text-slate-500
+                                "
+                            >
+                                Official source aur rules ko
+                                verify karke aage badhein.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =========================================
+                     CHAT
+                ========================================== -->
+
+                <section
+                    id="chatSection"
+                    class="mt-9"
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-end
+                            justify-between
+                            gap-3
+                        "
+                    >
+
+                        <div>
+
+                            <h3
+                                class="
+                                    text-xl
+                                    font-bold
+                                    text-navy-900
+                                "
+                            >
+                                🤖 YojanaSaathi se poochiye
+                            </h3>
+
+                            <p
+                                class="
+                                    mt-1
+                                    text-xs
+                                    text-slate-500
+                                "
+                            >
+                                Hindi, Hinglish ya English mein sawaal pooch sakte hain.
+                            </p>
+
+                        </div>
+
+                        <span
+                            id="connectionStatus"
+                            class="
+                                hidden
+                                sm:inline-flex
+                                items-center
+                                gap-1.5
+                                text-[10px]
+                                text-green-700
+                            "
+                        >
+                            <span
+                                class="
+                                    w-1.5
+                                    h-1.5
+                                    rounded-full
+                                    bg-green-600
+                                "
+                            ></span>
+
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <!-- Chat box -->
+
+                    <div
+                        class="
+                            mt-4
+                            bg-slate-100
+                            border
+                            border-slate-200
+                            rounded-2xl
+                            p-3
+                            sm:p-4
+                        "
+                    >
+
+                        <div
+                            id="chatMessages"
+                            aria-live="polite"
+                            aria-label="YojanaSaathi conversation"
+                            class="space-y-3"
+                        >
+
+                            <!-- Initial empty message -->
+
+                            <div
+                                id="chatEmpty"
+                                class="
+                                    flex
+                                    flex-col
+                                    items-center
+                                    justify-center
+                                    text-center
+                                    min-h-[190px]
+                                    px-4
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        w-12
+                                        h-12
+                                        rounded-full
+                                        bg-white
+                                        border
+                                        border-slate-200
+                                        shadow-sm
+                                        flex
+                                        items-center
+                                        justify-center
+                                        text-xl
+                                    "
+                                >
+                                    🇮🇳
+                                </div>
+
+                                <p
+                                    class="
+                                        mt-4
+                                        text-sm
+                                        font-bold
+                                        text-navy-900
+                                    "
+                                >
+                                    Namaste! Main YojanaSaathi hoon.
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-1
+                                        max-w-md
+                                        text-xs
+                                        leading-5
+                                        text-slate-500
+                                    "
+                                >
+                                    Aap apni situation bataiye.
+                                    Main step-by-step aapki profile samajhne
+                                    mein help karunga.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Typing indicator -->
+
+                        <div
+                            id="typingIndicator"
+                            class="hidden mt-3"
+                            aria-label="YojanaSaathi is typing"
+                        >
+
+                            <div
+                                class="
+                                    inline-flex
+                                    items-center
+                                    gap-1.5
+                                    bg-white
+                                    border
+                                    border-slate-200
+                                    rounded-xl
+                                    rounded-bl-sm
+                                    px-4
+                                    py-3
+                                    shadow-sm
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        typing-dot
+                                        w-1.5
+                                        h-1.5
+                                        rounded-full
+                                        bg-slate-400
+                                    "
+                                ></span>
+
+                                <span
+                                    class="
+                                        typing-dot
+                                        w-1.5
+                                        h-1.5
+                                        rounded-full
+                                        bg-slate-400
+                                    "
+                                ></span>
+
+                                <span
+                                    class="
+                                        typing-dot
+                                        w-1.5
+                                        h-1.5
+                                        rounded-full
+                                        bg-slate-400
+                                    "
+                                ></span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Chat input -->
+
+                        <div class="mobile-chat-bar">
+
+                            <form
+                                id="chatForm"
+                                class="
+                                    mt-3
+                                    flex
+                                    gap-2
+                                "
+                            >
+
+                                <label
+                                    for="chatInput"
+                                    class="sr-only"
+                                >
+                                    Apna sawaal likhiye
+                                </label>
+
+                                <input
+                                    id="chatInput"
+                                    type="text"
+                                    autocomplete="off"
+                                    enterkeyhint="send"
+                                    placeholder="Apna sawaal likhiye..."
+                                    class="
+                                        flex-1
+                                        min-w-0
+                                        px-4
+                                        py-3
+                                        rounded-lg
+                                        border
+                                        border-slate-300
+                                        bg-white
+                                        text-sm
+                                        text-slate-800
+                                        placeholder:text-slate-400
+                                        focus:border-navy-500
+                                        focus:ring-2
+                                        focus:ring-navy-100
+                                        outline-none
+                                        transition
+                                    "
+                                    aria-label="Apna sawaal likhiye"
+                                >
+
+                                <button
+                                    id="sendBtn"
+                                    type="submit"
+                                    class="
+                                        shrink-0
+                                        px-5
+                                        sm:px-6
+                                        py-3
+                                        rounded-lg
+                                        bg-navy-800
+                                        hover:bg-navy-700
+                                        disabled:bg-slate-300
+                                        disabled:text-slate-500
+                                        text-white
+                                        text-sm
+                                        font-bold
+                                        transition
+                                    "
+                                    aria-label="Sawaal bhejo"
+                                >
+                                    Bhejo
+                                </button>
+
+                            </form>
+
+                            <p
+                                class="
+                                    mt-2
+                                    text-center
+                                    text-[9px]
+                                    text-slate-400
+                                "
+                            >
+                                YojanaSaathi information assistant hai.
+                                Official rules verify karna zaroori hai.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer
+        class="
+            mt-8
+            border-t
+            border-slate-200
+            bg-white
+        "
+    >
+
+        <div
+            class="
+                max-w-7xl
+                mx-auto
+                px-4
+                sm:px-6
+                lg:px-8
+                py-7
+            "
+        >
+
+            <div
+                class="
+                    flex
+                    flex-col
+                    sm:flex-row
+                    sm:items-start
+                    sm:justify-between
+                    gap-5
+                "
+            >
+
+                <div>
+
+                    <p
+                        class="
+                            text-sm
+                            font-bold
+                            text-navy-900
+                        "
+                    >
+                        YojanaSaathi
+                    </p>
+
+                    <p
+                        class="
+                            mt-1
+                            max-w-xl
+                            text-[11px]
+                            leading-5
+                            text-slate-500
+                        "
+                    >
+                        Sarkari yojanaon ki information samajhne
+                        mein madad karne wala AI assistant.
+                    </p>
+
+                </div>
+
+
+                <div
+                    class="
+                        max-w-md
+                        text-[10px]
+                        leading-5
+                        text-slate-500
+                    "
+                >
+                    <span class="font-bold text-slate-700">
+                        Disclaimer:
+                    </span>
+
+                    Ye sirf jaankari ke liye hai.
+                    Apply karne se pehle official website
+                    par rules zaroor check karein.
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        /* =====================================================
+           DOM REFERENCES
+        ===================================================== */
+
+        const chatForm =
+            document.getElementById("chatForm");
+
+        const chatInput =
+            document.getElementById("chatInput");
+
+        const sendBtn =
+            document.getElementById("sendBtn");
+
+        const chatMessages =
+            document.getElementById("chatMessages");
+
+        const chatEmpty =
+            document.getElementById("chatEmpty");
+
+        const typingIndicator =
+            document.getElementById("typingIndicator");
+
+        const newChatBtn =
+            document.getElementById("newChatBtn");
+
+        const heroCta =
+            document.getElementById("heroCta");
+
+        const profileFields =
+            document.getElementById("profileFields");
+
+        const optionalProfileFields =
+            document.getElementById(
+                "optionalProfileFields"
+            );
+
+        const profileProgressText =
+            document.getElementById(
+                "profileProgressText"
+            );
+
+        const profileProgressBar =
+            document.getElementById(
+                "profileProgressBar"
+            );
+
+
+        /* =====================================================
+           API BASE URL
+
+           Same-origin when served by FastAPI.
+           file:// fallback uses localhost.
+        ====================================================== */
+
+        const API_BASE =
+            window.location.protocol === "file:"
+                ? "http://127.0.0.1:8000"
+                : "";
+
+
+        /* =====================================================
+           SESSION ID
+
+           crypto.randomUUID() preferred.
+           Date.now + Math.random fallback.
+        ====================================================== */
+
+        function createSessionId() {
+
+            if (
+                window.crypto &&
+                typeof window.crypto.randomUUID === "function"
+            ) {
+                return window.crypto.randomUUID();
+            }
+
+            return (
+                Date.now().toString(36) +
+                "-" +
+                Math.random()
+                    .toString(36)
+                    .slice(2)
+            );
+        }
+
+
+        let sessionId =
+            createSessionId();
+
+
+        /* =====================================================
+           PROFILE
+
+           Only the three required fields count toward 3/3.
+        ====================================================== */
+
+        let profile = {};
+
+
+        /* =====================================================
+           SAFE HTML ESCAPE
+        ====================================================== */
+
+        function escapeHTML(value) {
+
+            const div =
+                document.createElement("div");
+
+            div.textContent =
+                String(value ?? "");
+
+            return div.innerHTML;
+        }
+
+
+        /* =====================================================
+           SAFE URL
+
+           Only http / https sources are displayed.
+        ====================================================== */
+
+        function safeURL(value) {
+
+            try {
+
+                const url =
+                    new URL(
+                        String(value || "")
+                    );
+
+                if (
+                    url.protocol === "http:" ||
+                    url.protocol === "https:"
+                ) {
+                    return url.href;
+                }
+
+                return null;
+
+            } catch (error) {
+
+                return null;
+            }
+        }
+
+
+        /* =====================================================
+           BOT TEXT FORMATTER
+
+           Only:
+           **bold**
+           + newline -> <br>
+
+           Everything else is escaped first.
+        ====================================================== */
+
+        function formatBotText(text) {
+
+            let safe =
+                escapeHTML(text);
+
+            /*
+             * Escape HTML first.
+             * Then allow only **bold** syntax.
+             */
+
+            safe = safe.replace(
+                /\*\*([\s\S]*?)\*\*/g,
+                "<b>$1</b>"
+            );
+
+            /*
+             * New lines become line breaks.
+             */
+
+            safe =
+                safe.replace(
+                    /\r?\n/g,
+                    "<br>"
+                );
+
+            return safe;
+        }
+
+
+        /* =====================================================
+           PROFILE HELPERS
+        ====================================================== */
+
+        function getProfileValue(
+            possibleKeys
+        ) {
+
+            for (
+                const key of possibleKeys
+            ) {
+
+                if (
+                    profile[key] !== undefined &&
+                    profile[key] !== null &&
+                    String(profile[key]).trim() !== ""
+                ) {
+                    return profile[key];
+                }
+            }
+
+            return null;
+        }
+
+
+        function renderProfileField(
+            label,
+            keys
+        ) {
+
+            const value =
+                getProfileValue(keys);
+
+            const filled =
+                value !== null;
+
+            const displayValue =
+                filled
+                    ? escapeHTML(value)
+                    : "......";
+
+            const icon =
+                filled
+                    ? `
+                        <span
+                            class="
+                                flex
+                                items-center
+                                justify-center
+                                w-5
+                                h-5
+                                rounded-full
+                                bg-green-50
+                                text-green-700
+                                text-[10px]
+                                font-bold
+                            "
+                            aria-label="Completed"
+                        >
+                            ✓
+                        </span>
+                    `
+                    : `
+                        <span
+                            class="
+                                w-5
+                                h-5
+                                flex
+                                items-center
+                                justify-center
+                                text-slate-300
+                            "
+                            aria-hidden="true"
+                        >
+                            •
+                        </span>
+                    `;
+
+            return `
+                <div
+                    class="
+                        flex
+                        items-center
+                        justify-between
+                        gap-3
+                        px-3
+                        py-2.5
+                        rounded-lg
+                        ${
+                            filled
+                                ? "bg-green-50/60"
+                                : "bg-slate-50"
+                        }
+                        border
+                        ${
+                            filled
+                                ? "border-green-100"
+                                : "border-slate-100"
+                        }
+                    "
+                >
+
+                    <div class="flex items-center gap-2">
+
+                        ${icon}
+
+                        <span
+                            class="
+                                text-[11px]
+                                font-medium
+                                text-slate-600
+                            "
+                        >
+                            ${escapeHTML(label)}
+                        </span>
+
+                    </div>
+
+                    <span
+                        class="
+                            text-[11px]
+                            font-bold
+                            ${
+                                filled
+                                    ? "text-navy-800"
+                                    : "text-slate-400"
+                            }
+                            text-right
+                            max-w-[120px]
+                            truncate
+                        "
+                        title="${displayValue}"
+                    >
+                        ${displayValue}
+                    </span>
+
+                </div>
+            `;
+        }
+
+
+        function renderProfile() {
+
+            /*
+             * Required fields.
+             *
+             * Backend can use either annual_income
+             * or income, so both are supported.
+             */
+
+            const requiredFields = [
+
+                renderProfileField(
+                    "Umar",
+                    ["age"]
+                ),
+
+                renderProfileField(
+                    "Pesha",
+                    ["occupation"]
+                ),
+
+                renderProfileField(
+                    "Saalana aay",
+                    [
+                        "annual_income",
+                        "income"
+                    ]
+                )
+
+            ];
+
+
+            profileFields.innerHTML =
+                requiredFields.join("");
+
+
+            /*
+             * Optional fields.
+             */
+
+            const optionalFields = [
+
+                renderProfileField(
+                    "Rajya",
+                    ["state"]
+                ),
+
+                renderProfileField(
+                    "Ling",
+                    ["gender"]
+                )
+
+            ];
+
+
+            optionalProfileFields.innerHTML =
+                optionalFields.join("");
+
+
+            /*
+             * Required profile count.
+             */
+
+            const requiredKeys = [
+                ["age"],
+                ["occupation"],
+                ["annual_income", "income"]
+            ];
+
+
+            let completed = 0;
+
+
+            requiredKeys.forEach(
+                keys => {
+
+                    if (
+                        getProfileValue(keys) !== null
+                    ) {
+                        completed++;
+                    }
+
+                }
+            );
+
+
+            const percentage =
+                Math.round(
+                    (completed / 3) * 100
+                );
+
+
+            profileProgressText.textContent =
+                `${completed} / 3 bhari`;
+
+            profileProgressBar.style.width =
+                `${percentage}%`;
+        }
+
+
+        /* =====================================================
+           CHAT EMPTY STATE
+        ====================================================== */
+
+        function hideEmptyState() {
+
+            if (chatEmpty) {
+                chatEmpty.remove();
+            }
+        }
+
+
+        /* =====================================================
+           SCROLL CHAT
+        ====================================================== */
+
+        function scrollChatToBottom(
+            smooth = true
+        ) {
+
+            chatMessages.scrollTo({
+                top: chatMessages.scrollHeight,
+                behavior: smooth
+                    ? "smooth"
+                    : "auto"
+            });
+        }
+
+
+        /* =====================================================
+           SCROLL TO CHAT ON FIRST MESSAGE
+        ====================================================== */
+
+        function scrollToChatSection() {
+
+            const section =
+                document.getElementById(
+                    "chatSection"
+                );
+
+            if (!section) {
+                return;
+            }
+
+            section.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+
+        /* =====================================================
+           ADD USER MESSAGE
+        ====================================================== */
+
+        function addUserMessage(
+            text
+        ) {
+
+            hideEmptyState();
+
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.className =
+                "flex justify-end message-in";
+
+            const bubble =
+                document.createElement("div");
+
+            bubble.className =
+                `
+                    chat-user
+                    max-w-[88%]
+                    sm:max-w-[75%]
+                    px-4
+                    py-3
+                    text-sm
+                    leading-6
+                    shadow-sm
+                `;
+
+            /*
+             * textContent means user input
+             * can never inject HTML.
+             */
+
+            bubble.textContent =
+                text;
+
+            wrapper.appendChild(
+                bubble
+            );
+
+            chatMessages.appendChild(
+                wrapper
+            );
+
+            scrollChatToBottom();
+        }
+
+
+        /* =====================================================
+           ADD BOT MESSAGE
+        ====================================================== */
+
+        function addBotMessage(
+            answer,
+            sources
+        ) {
+
+            hideEmptyState();
+
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.className =
+                "flex justify-start message-in";
+
+
+            const messageColumn =
+                document.createElement("div");
+
+            messageColumn.className =
+                "max-w-[92%] sm:max-w-[80%]";
+
+
+            const bubble =
+                document.createElement("div");
+
+            bubble.className =
+                `
+                    chat-bot
+                    px-4
+                    py-3
+                    text-sm
+                    leading-6
+                    shadow-sm
+                `;
+
+
+            /*
+             * Only our safe formatter is allowed
+             * to produce HTML.
+             */
+
+            bubble.innerHTML =
+                formatBotText(
+                    answer
+                );
+
+
+            messageColumn.appendChild(
+                bubble
+            );
+
+
+            /*
+             * Sources
+             */
+
+            if (
+                Array.isArray(sources) &&
+                sources.length > 0
+            ) {
+
+                const sourceWrap =
+                    document.createElement(
+                        "div"
+                    );
+
+                sourceWrap.className =
+                    "mt-2";
+
+
+                const sourceLabel =
+                    document.createElement(
+                        "div"
+                    );
+
+                sourceLabel.className =
+                    `
+                        text-[9px]
+                        font-bold
+                        tracking-wider
+                        uppercase
+                        text-slate-400
+                        mb-1.5
+                    `;
+
+                sourceLabel.textContent =
+                    "Sources";
+
+                sourceWrap.appendChild(
+                    sourceLabel
+                );
+
+
+                const chips =
+                    document.createElement(
+                        "div"
+                    );
+
+                chips.className =
+                    "flex flex-wrap gap-1.5";
+
+
+                sources.forEach(
+                    source => {
+
+                        const url =
+                            safeURL(
+                                source?.url
+                            );
+
+                        if (!url) {
+                            return;
+                        }
+
+
+                        const link =
+                            document.createElement(
+                                "a"
+                            );
+
+                        link.className =
+                            `
+                                source-chip
+                                inline-flex
+                                items-center
+                                gap-1
+                                px-2.5
+                                py-1.5
+                                rounded-md
+                                border
+                                border-slate-200
+                                bg-white
+                                text-[10px]
+                                font-semibold
+                                text-navy-700
+                            `;
+
+                        link.href =
+                            url;
+
+                        link.target =
+                            "_blank";
+
+                        link.rel =
+                            "noopener";
+
+                        /*
+                         * textContent protects
+                         * source name.
+                         */
+
+                        link.textContent =
+                            `🏛️ ${
+                                source?.name ||
+                                "Source"
+                            } ↗`;
+
+                        chips.appendChild(
+                            link
+                        );
+
+                    }
+                );
+
+
+                sourceWrap.appendChild(
+                    chips
+                );
+
+                messageColumn.appendChild(
+                    sourceWrap
+                );
+            }
+
+
+            wrapper.appendChild(
+                messageColumn
+            );
+
+            chatMessages.appendChild(
+                wrapper
+            );
+
+            scrollChatToBottom();
+        }
+
+
+        /* =====================================================
+           ERROR MESSAGE
+        ====================================================== */
+
+        function addErrorMessage(
+            message
+        ) {
+
+            hideEmptyState();
+
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.className =
+                "flex justify-start message-in";
+
+
+            const bubble =
+                document.createElement("div");
+
+            bubble.className =
+                `
+                    max-w-[90%]
+                    px-4
+                    py-3
+                    rounded-xl
+                    rounded-bl-sm
+                    bg-red-50
+                    border
+                    border-red-100
+                    text-red-800
+                    text-sm
+                    leading-6
+                `;
+
+
+            bubble.textContent =
+                message;
+
+
+            wrapper.appendChild(
+                bubble
+            );
+
+            chatMessages.appendChild(
+                wrapper
+            );
+
+            scrollChatToBottom();
+        }
+
+
+        /* =====================================================
+           TYPING STATE
+        ====================================================== */
+
+        function setLoading(
+            loading
+        ) {
+
+            sendBtn.disabled =
+                loading;
+
+            chatInput.disabled =
+                loading;
+
+            typingIndicator.classList.toggle(
+                "hidden",
+                !loading
+            );
+
+
+            if (loading) {
+
+                sendBtn.textContent =
+                    "Bhej raha hoon...";
+
+            } else {
+
+                sendBtn.textContent =
+                    "Bhejo";
+
+                chatInput.disabled =
+                    false;
+            }
+
+        }
+
+
+        /* =====================================================
+           SEND QUESTION TO FASTAPI
+        ====================================================== */
+
+        async function sendQuestion(
+            question
+        ) {
+
+            const cleaned =
+                String(question || "")
+                    .trim();
+
+            if (!cleaned) {
+                return;
+            }
+
+
+            if (
+                sendBtn.disabled
+            ) {
+                return;
+            }
+
+
+            addUserMessage(
+                cleaned
+            );
+
+
+            chatInput.value =
+                "";
+
+            setLoading(
+                true
+            );
+
+
+            /*
+             * First real chat interaction:
+             * smoothly bring the conversation into view.
+             */
+
+            scrollToChatSection();
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE}/ask`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                question:
+                                    cleaned,
+
+                                session_id:
+                                    sessionId
+                            })
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Server error: ${response.status}`
+                    );
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                /*
+                 * Backend contract:
+                 *
+                 * data["answer"]
+                 * data.get("profile", {})
+                 * data.get("sources", [])
+                 */
+
+                const answer =
+                    typeof data.answer === "string"
+                        ? data.answer
+                        : "Mujhe is sawaal ka jawab nahi mil paaya.";
+
+
+                const returnedProfile =
+                    data.profile;
+
+
+                if (
+                    returnedProfile &&
+                    typeof returnedProfile === "object" &&
+                    !Array.isArray(returnedProfile)
+                ) {
+
+                    profile =
+                        returnedProfile;
+
+                    renderProfile();
+                }
+
+
+                const sources =
+                    Array.isArray(
+                        data.sources
+                    )
+                        ? data.sources
+                        : [];
+
+
+                addBotMessage(
+                    answer,
+                    sources
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "YojanaSaathi API error:",
+                    error
+                );
+
+
+                addErrorMessage(
+                    "Maaf kijiye, abhi server se jawab nahi aa paaya. "
+                    + "Thodi der baad dobara try kijiye."
+                );
+
+            } finally {
+
+                setLoading(
+                    false
+                );
+
+                chatInput.focus();
+            }
+
+        }
+
+
+        /* =====================================================
+           CHAT FORM
+        ====================================================== */
+
+        chatForm.addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+                if (
+                    sendBtn.disabled
+                ) {
+                    return;
+                }
+
+                sendQuestion(
+                    chatInput.value
+                );
+            }
+        );
+
+
+        /* =====================================================
+           EXAMPLE QUESTION CHIPS
+        ====================================================== */
+
+        document
+            .querySelectorAll(
+                ".example-chip"
+            )
+            .forEach(
+                button => {
+
+                    button.className += `
+                        px-3
+                        py-2
+                        rounded-full
+                        border
+                        border-slate-200
+                        bg-white
+                        text-[11px]
+                        font-medium
+                        text-navy-700
+                        hover:bg-navy-50
+                        hover:border-navy-200
+                        transition
+                        shadow-sm
+                    `;
+
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+                            sendQuestion(
+                                button.dataset.question
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =====================================================
+           CATEGORY BUTTONS
+        ====================================================== */
+
+        document
+            .querySelectorAll(
+                ".category-button"
+            )
+            .forEach(
+                button => {
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+                            sendQuestion(
+                                button.dataset.question
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /* =====================================================
+           HERO CTA
+        ====================================================== */
+
+        heroCta.addEventListener(
+            "click",
+            function() {
+
+                chatInput.focus();
+
+                scrollToChatSection();
+
+            }
+        );
+
+
+        /* =====================================================
+           NEW CONVERSATION
+        ====================================================== */
+
+        newChatBtn.addEventListener(
+            "click",
+            function() {
+
+                sessionId =
+                    createSessionId();
+
+                profile = {};
+
+
+                /*
+                 * Clear chat.
+                 */
+
+                chatMessages.innerHTML = "";
+
+
+                /*
+                 * Recreate empty state.
+                 */
+
+                const empty =
+                    document.createElement(
+                        "div"
+                    );
+
+                empty.id =
+                    "chatEmpty";
+
+                empty.className =
+                    `
+                        flex
+                        flex-col
+                        items-center
+                        justify-center
+                        text-center
+                        min-h-[190px]
+                        px-4
+                    `;
+
+                empty.innerHTML =
+                    `
+                        <div
+                            class="
+                                w-12
+                                h-12
+                                rounded-full
+                                bg-white
+                                border
+                                border-slate-200
+                                shadow-sm
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            🇮🇳
+                        </div>
+
+                        <p
+                            class="
+                                mt-4
+                                text-sm
+                                font-bold
+                                text-navy-900
+                            "
+                        >
+                            Namaste! Main YojanaSaathi hoon.
+                        </p>
+
+                        <p
+                            class="
+                                mt-1
+                                max-w-md
+                                text-xs
+                                leading-5
+                                text-slate-500
+                            "
+                        >
+                            Aap apni situation bataiye.
+                            Main step-by-step aapki profile samajhne
+                            mein help karunga.
+                        </p>
+                    `;
+
+
+                chatMessages.appendChild(
+                    empty
+                );
+
+
+                /*
+                 * Reset profile.
+                 */
+
+                renderProfile();
+
+
+                /*
+                 * Reset input state.
+                 */
+
+                setLoading(
+                    false
+                );
+
+                chatInput.value =
+                    "";
+
+                chatInput.focus();
+
+
+                /*
+                 * Return user to top.
+                 */
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
+            }
+        );
+
+
+        /* =====================================================
+           INITIAL PROFILE RENDER
+        ====================================================== */
+
+        renderProfile();
+
+
+        /* =====================================================
+           NO AUTOFOCUS
+           
+           Deliberately do NOT call:
+           chatInput.focus()
+           
+           This keeps page at the top on first load.
+        ====================================================== */
+
+    </script>
+
+</body>
+</html>

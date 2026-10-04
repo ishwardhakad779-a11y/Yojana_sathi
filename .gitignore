@@ -1,0 +1,9 @@
+.env
+venv/
+data/
+chroma_db/
+__pycache__/
+*.pyc
+.vscode/
+.pytest_cache/
+evals/results*.json

@@ -1,0 +1,521 @@
+{
+  "time": "2026-10-02T21:42:00.560711",
+  "model": "openai/gpt-oss-20b",
+  "rows": [
+    {
+      "id": 1,
+      "question": "Meri umar 35 saal hai, main kisan hoon, saal ki income 1.5 lakh hai. Mujhe kaunsi yojana milegi?",
+      "expected": [
+        "PM-Kisan Samman Nidhi"
+      ],
+      "acceptable": [
+        "Kisan Credit Card (KCC)",
+        "PM Fasal Bima Yojana (PMFBY)",
+        "PM Jan Dhan Yojana"
+      ],
+      "sources": [
+        "Kisan Credit Card (KCC)",
+        "PM-Kisan Samman Nidhi",
+        "PM Fasal Bima Yojana (PMFBY)"
+      ],
+      "retrieved": [
+        "Kisan Credit Card (KCC)",
+        "PM-Kisan Samman Nidhi",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "PM Vishwakarma Yojana",
+        "Sukanya Samriddhi Yojana",
+        "PM Fasal Bima Yojana (PMFBY)"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "Kisan Credit Card: Kisan ko kheti ke kharche ke liye sasta loan milta hai, 7% tak interest, 3 lakh tak limit. Apply karein apne najdiki bank branch se.\nPM-Kisan Samman Nidhi: Chhote kisan ko saal 6000 rupaye teen kisto mein milte hain, bank account mein seedha transfer. Register karein pmkisan.gov.in ya CSC centre.\nPM Fasal Bima Yojana: Fasal kharab hone par bima claim milta hai, premium 2%/1.5%/5% aur sarkar bharti. Apply karein pmfby.gov.in, bank ya CSC centre."
+    },
+    {
+      "id": 2,
+      "question": "Meri umar 40 saal hai, kisan hoon, income 2 lakh. Fasal kharab ho gayi, kya madad milegi?",
+      "expected": [
+        "PM Fasal Bima Yojana (PMFBY)"
+      ],
+      "acceptable": [
+        "Kisan Credit Card (KCC)",
+        "PM-Kisan Samman Nidhi"
+      ],
+      "sources": [
+        "PM Fasal Bima Yojana (PMFBY)",
+        "PM-Kisan Samman Nidhi"
+      ],
+      "retrieved": [
+        "PM Fasal Bima Yojana (PMFBY)",
+        "PM-Kisan Samman Nidhi",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Kisan Credit Card (KCC)",
+        "Stand-Up India",
+        "PM Vishwakarma Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM Fasal Bima Yojana: Fasal kharab hone par bima paisa milta hai, claim ke liye pmfby.gov.in ya bank/CSC centre se apply karein.\nPM-Kisan Samman Nidhi: Saal mein 6000 rupaye cash transfer milta hai, apply pmkisan.gov.in ya CSC centre se karein.\nApply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 3,
+      "question": "Main 45 saal ka kisan hoon, income 2 lakh. Kheti ke liye sasta loan chahiye.",
+      "expected": [
+        "Kisan Credit Card (KCC)"
+      ],
+      "acceptable": [
+        "PM-Kisan Samman Nidhi",
+        "PM Fasal Bima Yojana (PMFBY)",
+        "PM Mudra Yojana"
+      ],
+      "sources": [
+        "Kisan Credit Card (KCC)"
+      ],
+      "retrieved": [
+        "Kisan Credit Card (KCC)",
+        "PM-Kisan Samman Nidhi",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "PM Mudra Yojana",
+        "Stand-Up India",
+        "PM Fasal Bima Yojana (PMFBY)"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "Kisan Credit Card se aapko 7% tak ka sasta loan milta hai, 3 lakh tak short-term crop loan par sarkar chhoot deti hai, apply karne ke liye najdiki bank branch se."
+    },
+    {
+      "id": 4,
+      "question": "Meri umar 25 hai, rehri lagata hoon, income 2 lakh. Loan milega?",
+      "expected": [
+        "PM SVANidhi (Rehri-Patri Loan)"
+      ],
+      "acceptable": [
+        "PM Mudra Yojana",
+        "e-Shram Card",
+        "PM Jan Dhan Yojana"
+      ],
+      "sources": [
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "PM Mudra Yojana"
+      ],
+      "retrieved": [
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "PM-Kisan Samman Nidhi",
+        "PM Vishwakarma Yojana",
+        "PM Mudra Yojana",
+        "Stand-Up India",
+        "Kisan Credit Card (KCC)"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM SVANidhi: Ye street vendor ke liye working capital loan hai, bina guarantee. Pehla loan Rs 15,000, doosra Rs 25,000, teesra Rs 50,000. Samay par repayment par 7% byaaj subsidy aur digital payment par cashback. Apply karne ke liye pmsvanidhi.mohua.gov.in ya bank/CSC se.\nPM Mudra Yojana: Chhote vyapaar ya dukaan ke liye bina guarantee loan. Aap street vendor ho, to small business consider kiya ja sakta hai. Loan limit alag-alag categories mein. Apply karne ke liye bank, NBFC ya MFI se. Business plan aur ID proof chahiye. Apply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 5,
+      "question": "Meri umar 30 saal hai, chhoti dukaan chalata hoon, income 3 lakh. Business ke liye bina guarantee loan chahiye.",
+      "expected": [
+        "PM Mudra Yojana"
+      ],
+      "acceptable": [
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Stand-Up India"
+      ],
+      "sources": [
+        "PM Mudra Yojana"
+      ],
+      "retrieved": [
+        "PM Mudra Yojana",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Ayushman Bharat PM-JAY",
+        "PM Ujjwala Yojana",
+        "Stand-Up India",
+        "Kisan Credit Card (KCC)"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM Mudra Yojana: Chhote vyapaar ke liye bina guarantee loan milta hai. Apply bank, NBFC ya MFI se business plan aur ID proof ke saath."
+    },
+    {
+      "id": 6,
+      "question": "Meri beti 5 saal ki hai, main 32 saal ka mazdoor hoon, income 1 lakh. Beti ke liye bachat yojana batao.",
+      "expected": [
+        "Sukanya Samriddhi Yojana"
+      ],
+      "acceptable": [
+        "PM Jan Dhan Yojana"
+      ],
+      "sources": [
+        "Sukanya Samriddhi Yojana",
+        "PM Jan Dhan Yojana"
+      ],
+      "retrieved": [
+        "Sukanya Samriddhi Yojana",
+        "PM Jan Dhan Yojana",
+        "Atal Pension Yojana (APY)",
+        "e-Shram Card",
+        "PM-Kisan Samman Nidhi",
+        "PM Vishwakarma Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "Sukanya Samriddhi Yojana: Beti ki padhai aur shaadi ke liye bachat, 10 saal se kam umar, Rs 250 se khol sakte hain, 8.2% interest, tax free. Apply post office ya bank mein. PM Jan Dhan Yojana: Zero balance savings account, free RuPay card, Rs 2 lakh accident insurance, 6 mahine baad overdraft. Apply kisi bhi bank branch ya Bank Mitra. Apply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 7,
+      "question": "Main 28 saal ka mazdoor hoon, income 1.2 lakh. Budhape ki pension yojana batao.",
+      "expected": [
+        "Atal Pension Yojana (APY)"
+      ],
+      "acceptable": [
+        "e-Shram Card",
+        "PM Jan Dhan Yojana"
+      ],
+      "sources": [
+        "Atal Pension Yojana (APY)"
+      ],
+      "retrieved": [
+        "Atal Pension Yojana (APY)",
+        "PM Jan Dhan Yojana",
+        "PM-Kisan Samman Nidhi",
+        "e-Shram Card",
+        "Sukanya Samriddhi Yojana",
+        "PM Vishwakarma Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "Atal Pension Yojana: 18-40 saal ke mazdooron ke liye pension scheme, 60 saal ke baad har mahine Rs 1000-5000 milta hai. Apply karne ke liye apne bank ya post office mein form bharke submit karein, Aadhaar aur mobile number zaroori hai."
+    },
+    {
+      "id": 8,
+      "question": "Main 30 saal ka construction mazdoor hoon, income 1.5 lakh. Accident insurance milega?",
+      "expected": [
+        "e-Shram Card"
+      ],
+      "acceptable": [
+        "PM Jan Dhan Yojana",
+        "Atal Pension Yojana (APY)"
+      ],
+      "sources": [
+        "e-Shram Card",
+        "PM Jan Dhan Yojana"
+      ],
+      "retrieved": [
+        "e-Shram Card",
+        "PM Jan Dhan Yojana",
+        "Ayushman Bharat PM-JAY",
+        "PM Awas Yojana (PMAY)",
+        "Stand-Up India",
+        "PM Vishwakarma Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "e-Shram Card: 30 saal ka construction mazdoor, income 1.5 lakh, income tax nahi, isliye PMSBY ke tahat Rs 2 lakh accident insurance milta hai. Apply karein eshram.gov.in par Aadhaar, mobile, bank account se online registration.\nPM Jan Dhan Yojana: Jan Dhan account kholne se free RuPay debit card milta hai jisme Rs 2 lakh accident insurance hota hai. Apply karein kisi bhi bank branch ya Bank Mitra se, Aadhaar, voter ID, etc."
+    },
+    {
+      "id": 9,
+      "question": "Main 38 saal ka badhai (carpenter) hoon, income 1.8 lakh. Auzaar aur training ke liye koi yojana?",
+      "expected": [
+        "PM Vishwakarma Yojana"
+      ],
+      "acceptable": [
+        "PM Mudra Yojana"
+      ],
+      "sources": [
+        "PM Vishwakarma Yojana",
+        "PM Mudra Yojana"
+      ],
+      "retrieved": [
+        "PM Vishwakarma Yojana",
+        "PM-Kisan Samman Nidhi",
+        "PM Mudra Yojana",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Sukanya Samriddhi Yojana",
+        "Stand-Up India"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM Vishwakarma Yojana: Tools and training with stipend, toolkit incentive, and loan. Apply at pmvishwakarma.gov.in or CSC centre.\nPM Mudra Yojana: Small business loan to buy tools. Apply at bank/ NBFC with business plan."
+    },
+    {
+      "id": 10,
+      "question": "Main 22 saal ka student hoon, SC category, parivaar ki income 2 lakh. Scholarship milegi?",
+      "expected": [
+        "National Scholarship Portal (NSP) Scholarships"
+      ],
+      "acceptable": [],
+      "sources": [
+        "National Scholarship Portal (NSP) Scholarships"
+      ],
+      "retrieved": [
+        "National Scholarship Portal (NSP) Scholarships",
+        "Stand-Up India",
+        "Sukanya Samriddhi Yojana",
+        "PM-Kisan Samman Nidhi",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "PM Vishwakarma Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "National Scholarship Portal (NSP) scholarship: SC post‑matric scholarship ke liye aapke family income 2 lakh hai, jo 2.5 lakh ki limit se kam hai, isliye aap qualify kar sakte hain. Apply karne ke liye pehle NSP par One‑Time Registration (OTR) karein, phir apni desired scheme chunein, form bhar kar required documents (jaati praman, income proof, marksheet, Aadhaar, bank passbook) upload karein. Deadline 31 October 2026 hai, lekin apni scheme ki tareekh portal par check kar lein.\n\nApply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 11,
+      "question": "Meri umar 50 saal hai, mazdoor hoon, income 1 lakh. Muft ilaaj ke liye 5 lakh ka health cover chahiye.",
+      "expected": [
+        "Ayushman Bharat PM-JAY"
+      ],
+      "acceptable": [
+        "PM Jan Dhan Yojana",
+        "e-Shram Card"
+      ],
+      "sources": [
+        "Ayushman Bharat PM-JAY"
+      ],
+      "retrieved": [
+        "Ayushman Bharat PM-JAY",
+        "PM Fasal Bima Yojana (PMFBY)",
+        "e-Shram Card",
+        "PM Jan Dhan Yojana",
+        "Atal Pension Yojana (APY)",
+        "PM Vishwakarma Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "Ayushman Bharat PM-JAY: Eligible families get up to ₹5 lakh free treatment; apply by visiting a CSC or empanelled hospital with Aadhaar or ration card. Apply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 12,
+      "question": "Main 34 saal ki mahila hoon, gharelu kaam karti hoon, ghar mein LPG cylinder nahi hai, income 1 lakh. Muft gas connection milega?",
+      "expected": [
+        "PM Ujjwala Yojana"
+      ],
+      "acceptable": [
+        "PM Jan Dhan Yojana"
+      ],
+      "sources": [
+        "PM Ujjwala Yojana"
+      ],
+      "retrieved": [
+        "PM Ujjwala Yojana",
+        "Ayushman Bharat PM-JAY",
+        "PM Jan Dhan Yojana",
+        "PM Mudra Yojana",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Stand-Up India"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM Ujjwala Yojana: Garib parivaar ki mahilaon ko muft LPG connection milta hai. Aavedan mahila ke naam par hota hai, nazdiki LPG distributor ke paas. KYC, ration card aur Aadhaar chahiye. Apply karne ke liye apne najdiki LPG distributor ya online portal par jaakar form bhar sakte hain."
+    },
+    {
+      "id": 13,
+      "question": "Meri umar 42 saal hai, kaccha ghar hai, mazdoor hoon, income 1.2 lakh. Pakka ghar banane mein madad chahiye.",
+      "expected": [
+        "PM Awas Yojana (PMAY)"
+      ],
+      "acceptable": [],
+      "sources": [
+        "PM Awas Yojana (PMAY)"
+      ],
+      "retrieved": [
+        "PM Awas Yojana (PMAY)",
+        "e-Shram Card",
+        "Stand-Up India",
+        "PM Vishwakarma Yojana",
+        "PM-Kisan Samman Nidhi",
+        "Sukanya Samriddhi Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM Awas Yojana: Ghar na rakhne wale ya kaccha ghar wale parivaaron ko pakka ghar banane ya kharidne mein madad milti hai. Apply karne ke liye aadhaar, income proof, bank details ke saath online ya CSC centre par register karein. Apply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 14,
+      "question": "Main 29 saal ki SC mahila hoon, abhi ghar par kaam karti hoon, naya business shuru karna hai, income 2 lakh. 20 lakh ka loan chahiye.",
+      "expected": [
+        "Stand-Up India"
+      ],
+      "acceptable": [
+        "PM Mudra Yojana"
+      ],
+      "sources": [
+        "Stand-Up India",
+        "PM Mudra Yojana"
+      ],
+      "retrieved": [
+        "Stand-Up India",
+        "PM Mudra Yojana",
+        "PM Ujjwala Yojana",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Kisan Credit Card (KCC)",
+        "Sukanya Samriddhi Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "Stand-Up India: SC mahila ke liye 10 lakh se 1 crore tak ka loan milta hai, greenfield project ke liye. Apply standupmitra.in ya bank branch se. PM Mudra Yojana: chhote vyapaar ke liye 10 lakh tak ka loan bina guarantee, apply bank/nbfc se. Apply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 15,
+      "question": "Meri umar 27 hai, mazdoor hoon, income 1 lakh. Mera bank account nahi hai, zero balance khata kaise khulega?",
+      "expected": [
+        "PM Jan Dhan Yojana"
+      ],
+      "acceptable": [],
+      "sources": [
+        "PM Jan Dhan Yojana"
+      ],
+      "retrieved": [
+        "PM Jan Dhan Yojana",
+        "Sukanya Samriddhi Yojana",
+        "PM-Kisan Samman Nidhi",
+        "Stand-Up India",
+        "PM Mudra Yojana",
+        "e-Shram Card"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM Jan Dhan Yojana se aap zero balance khata khol sakte hain. Isme minimum balance ki jarurat nahi, free RuPay debit card milta hai, aur 6 mahine baad overdraft bhi mil sakta hai. Apply karne ke liye Aadhaar, voter ID ya driving licence, NREGA job card ya PAN ki jarurat hai. Khata bank branch ya Bank Mitra (Banking Correspondent) par khol sakte hain. Apply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 16,
+      "question": "Main 33 saal ki mahila hoon, tailor hoon, income 1.5 lakh. Silai ke kaam ke liye koi yojana?",
+      "expected": [
+        "PM Vishwakarma Yojana"
+      ],
+      "acceptable": [
+        "PM Mudra Yojana",
+        "e-Shram Card"
+      ],
+      "sources": [
+        "PM Vishwakarma Yojana",
+        "Stand-Up India"
+      ],
+      "retrieved": [
+        "PM Vishwakarma Yojana",
+        "PM-Kisan Samman Nidhi",
+        "Sukanya Samriddhi Yojana",
+        "National Scholarship Portal (NSP) Scholarships",
+        "PM Ujjwala Yojana",
+        "Stand-Up India"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": false,
+      "passed": false,
+      "answer": "PM Vishwakarma Yojana: Tailor ke liye training, stipend, toolkit aur loan milta hai. Apply pmvishwakarma.gov.in ya CSC centre se. Stand-Up India: Mahila udyamiyon ke liye 10 lakh tak ka loan, apply standupmitra.in ya bank branch se. Apply karne se pehle official site pe rules check kar lein."
+    },
+    {
+      "id": 17,
+      "question": "Main 26 saal ka street vendor hoon, sabzi bechta hoon, income 1.5 lakh. Digital payment pe cashback ya byaaj subsidy milegi?",
+      "expected": [
+        "PM SVANidhi (Rehri-Patri Loan)"
+      ],
+      "acceptable": [],
+      "sources": [
+        "PM SVANidhi (Rehri-Patri Loan)"
+      ],
+      "retrieved": [
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "PM Mudra Yojana",
+        "Stand-Up India",
+        "Kisan Credit Card (KCC)",
+        "Sukanya Samriddhi Yojana",
+        "PM Jan Dhan Yojana"
+      ],
+      "retrieval_hit": true,
+      "answer_hit": true,
+      "clean": true,
+      "passed": true,
+      "answer": "PM SVANidhi: Street vendors can get a working‑capital loan (Rs 15,000, Rs 25,000, Rs 50,000) with a 7% interest subsidy and digital payment cashback if they repay on time. Apply at pmsvanidhi.mohua.gov.in or through a bank/CSC."
+    },
+    {
+      "id": 18,
+      "question": "Bitcoin mein paisa kaise lagayein?",
+      "expected": [],
+      "acceptable": [],
+      "sources": [],
+      "retrieved": [
+        "Sukanya Samriddhi Yojana",
+        "PM Jan Dhan Yojana",
+        "PM-Kisan Samman Nidhi",
+        "Atal Pension Yojana (APY)",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Kisan Credit Card (KCC)"
+      ],
+      "retrieval_hit": null,
+      "answer_hit": null,
+      "clean": true,
+      "passed": true,
+      "answer": "mujhe pakki jaankari nahi hai"
+    },
+    {
+      "id": 19,
+      "question": "Aaj ka mausam kaisa hai?",
+      "expected": [],
+      "acceptable": [],
+      "sources": [],
+      "retrieved": [
+        "PM Mudra Yojana",
+        "National Scholarship Portal (NSP) Scholarships",
+        "PM-Kisan Samman Nidhi",
+        "Kisan Credit Card (KCC)",
+        "PM SVANidhi (Rehri-Patri Loan)",
+        "Sukanya Samriddhi Yojana"
+      ],
+      "retrieval_hit": null,
+      "answer_hit": null,
+      "clean": true,
+      "passed": true,
+      "answer": "mujhe pakki jaankari nahi hai"
+    },
+    {
+      "id": 20,
+      "question": "Mujhe Mumbai se Delhi ki train ticket book karni hai.",
+      "expected": [],
+      "acceptable": [],
+      "sources": [],
+      "retrieved": [
+        "PM Ujjwala Yojana",
+        "PM Jan Dhan Yojana",
+        "National Scholarship Portal (NSP) Scholarships",
+        "Sukanya Samriddhi Yojana",
+        "PM Vishwakarma Yojana",
+        "Kisan Credit Card (KCC)"
+      ],
+      "retrieval_hit": null,
+      "answer_hit": null,
+      "clean": true,
+      "passed": true,
+      "answer": "mujhe pakki jaankari nahi hai"
+    }
+  ]
+}
