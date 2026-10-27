@@ -36,11 +36,12 @@ def extract_profile(state: State):
     prompt = f"""User ka message padho aur sirf JSON do.
 Keys:
 - age (number ya null)
-- occupation (string ya null)
+- occupation (string ya null; jaise "kisan", "student", "street vendor" agar rehri/thela/patri lagata hai, "mazdoor", "dukaandar")
 - annual_income (rupaye mein number, jaise 1.5 lakh = 150000, ya null)
 - state (string ya null)
 - gender (string ya null)
-- intent ("greeting" agar message sirf hello/hi/hey jaisa abhivadan hai, "eligibility" agar user poochh raha hai ki use kaunsi yojana milegi, warna "info")
+- intent ("greeting" agar message sirf hello/hi/hey jaisa abhivadan hai; "eligibility" sirf tab jab user general tarah se poochh raha hai ki use kaunsi yojana milegi aur koi khaas zaroorat ya yojana ka naam nahi bataya; "info" agar user kisi khaas yojana ke baare mein poochh raha hai ya kisi khaas zaroorat (ilaaj, ghar, loan, fasal bima, scholarship) ke liye madad maang raha hai
+...ya kisi khaas zaroorat (ilaaj, ghar, loan, fasal bima, scholarship) ke liye madad maang raha hai; jaise "Ayushman card kaise banta hai?", "Stand-Up India kis ke liye hai?", "Mudra mein kitna loan milta hai?")
 
 Purani profile: {json.dumps(old, ensure_ascii=False)}
 Message: {state['question']}
@@ -67,13 +68,24 @@ Jo cheez message mein nahi hai, usse null rakho."""
     return {"profile": profile, "intent": intent}
 
 
+SCHEME_WORDS = [
+    "stand-up", "standup", "mudra", "ayushman", "svanidhi", "kisan credit", "kcc",
+    "fasal bima", "pmfby", "sukanya", "atal pension", "vishwakarma", "ujjwala",
+    "awas", "jan dhan", "shram", "pm-kisan", "pm kisan",
+]
+
+
 def route(state: State):
     if state["intent"] == "greeting":
         return "greet"
-    if state["intent"] == "eligibility" and missing(state["profile"]):
-        return "ask"
-    return "retrieve"
 
+    q = state["question"].lower()
+    names_a_scheme = any(w in q for w in SCHEME_WORDS)
+
+    if state["intent"] == "eligibility" and missing(state["profile"]) and not names_a_scheme:
+        return "ask"
+
+    return "retrieve"
 
 def greet(state: State):
     return {
