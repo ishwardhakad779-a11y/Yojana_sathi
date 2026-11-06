@@ -1,14 +1,14 @@
-import os
 import json
+import logging
 from typing import TypedDict
 from dotenv import load_dotenv
-from groq import Groq
 
 from app.rag.retriever import search
+from app.agent.llm import generate, generate_json, GROQ_MODELS
 
 load_dotenv()
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-MODEL ="openai/gpt-oss-20b"
+logger = logging.getLogger("yojana_sathi.nodes")
+MODEL = GROQ_MODELS[0]
 
 REQUIRED = {
     "age": "aapki umar kitni hai",
@@ -36,24 +36,17 @@ def extract_profile(state: State):
     prompt = f"""User ka message padho aur sirf JSON do.
 Keys:
 - age (number ya null)
-- occupation (string ya null; jaise "kisan", "student", "street vendor" agar rehri/thela/patri lagata hai, "mazdoor", "dukaandar")
+- occupation (string ya null; user jo kaam karta hai wo likho, jaise "kisan", "student", "street vendor", "mazdoor", "dukaandar", "painter", "driver", "carpenter", "tailor", etc.)
 - annual_income (rupaye mein number, jaise 1.5 lakh = 150000, ya null)
 - state (string ya null)
 - gender (string ya null)
-- intent ("greeting" agar message sirf hello/hi/hey jaisa abhivadan hai; "eligibility" sirf tab jab user general tarah se poochh raha hai ki use kaunsi yojana milegi aur koi khaas zaroorat ya yojana ka naam nahi bataya; "info" agar user kisi khaas yojana ke baare mein poochh raha hai ya kisi khaas zaroorat (ilaaj, ghar, loan, fasal bima, scholarship) ke liye madad maang raha hai
-...ya kisi khaas zaroorat (ilaaj, ghar, loan, fasal bima, scholarship) ke liye madad maang raha hai; jaise "Ayushman card kaise banta hai?", "Stand-Up India kis ke liye hai?", "Mudra mein kitna loan milta hai?")
+- intent ("greeting" agar message sirf hello/hi/hey jaisa abhivadan hai; "eligibility" sirf tab jab user general tarah se poochh raha hai ki use kaunsi yojana milegi aur koi khaas zaroorat ya yojana ka naam nahi bataya; "info" agar user kisi khaas yojana ke baare mein poochh raha hai ya kisi khaas zaroorat (ilaaj, ghar, loan, fasal bima, scholarship, pension, budhapa, bachat, khata, gas, rashan, toolkit, training) ke liye madad maang raha hai, ya koi general sawal poochh raha hai)
 
 Purani profile: {json.dumps(old, ensure_ascii=False)}
 Message: {state['question']}
 Jo cheez message mein nahi hai, usse null rakho."""
 
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0,
-        response_format={"type": "json_object"},
-    )
-    data = json.loads(resp.choices[0].message.content)
+    data = generate_json(prompt, temperature=0.0)
     intent = data.pop("intent", "info")
     profile = {**old, **{k: v for k, v in data.items() if v is not None}}
 
@@ -70,8 +63,10 @@ Jo cheez message mein nahi hai, usse null rakho."""
 
 SCHEME_WORDS = [
     "stand-up", "standup", "mudra", "ayushman", "svanidhi", "kisan credit", "kcc",
-    "fasal bima", "pmfby", "sukanya", "atal pension", "vishwakarma", "ujjwala",
-    "awas", "jan dhan", "shram", "pm-kisan", "pm kisan",
+    "fasal bima", "pmfby", "sukanya", "atal pension", "pension", "vishwakarma", "ujjwala",
+    "awas", "jan dhan", "shram", "pm-kisan", "pm kisan", "scholarship", "nsp",
+    "pmsby", "pmjjby", "suraksha bima", "jeevan jyoti", "matru vandana", "pmmvy",
+    "maandhan", "maan-dhan", "pm-sym", "old age pension",
 ]
 
 
@@ -112,18 +107,14 @@ def build_query(topic: str, profile: dict) -> str:
     prompt = f"""Neeche user ka sawal aur profile hai. Isse ek chhoti ENGLISH search query banao
 (max 12 words) jo sarkari yojana dhoondhne ke kaam aaye. Hinglish shabdon ko English mein badlo
 (jaise rehri/thela/patri = street vendor, kisan = farmer, beti = girl child,
-mazdoor = labourer, dukaan = small shop business, padhai = education scholarship).
+mazdoor = labourer, dukaan = small shop business, padhai = education scholarship,
+budhapa/pension = old age pension APY, painter/rangai = unorganised painter).
 Sirf query likho, aur kuch nahi.
 
 Sawal: {topic}
 Profile: {json.dumps(profile, ensure_ascii=False)}"""
     try:
-        resp = client.chat.completions.create(
-            model=MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-        )
-        return resp.choices[0].message.content.strip()
+        return generate(prompt, temperature=0.0)
     except Exception:
         return topic
 
@@ -163,19 +154,13 @@ Rules:
 - Har yojana ke saath ek line mein batao ki kyun kaam ki hai aur kaise apply karna hai.
 - Jo yojana relevant nahi hai, usse mat batao.
 - Jawab ke text mein [1] jaise number mat likhna, sirf yojana ka naam likhna.
-- Agar context mein jawab nahi hai, bolo "mujhe pakki jaankari nahi hai" aur "used" khaali rakho.
+- Agar context mein jawab nahi hai, ya sawal sarkari yojanaon ke baare mein nahi hai (jaise product/tractor/bike recommendation, crypto, share market, train ticket, weather, general gyan), toh context ko zabardasti connect mat karo. Bolo "mujhe pakki jaankari nahi hai" aur "used": [] rakho.
 - End mein bolo ki apply karne se pehle official site pe rules check kar lein.
 
 Sirf JSON do: {{"answer": "...", "used": [1, 3]}}
 "used" mein sirf un yojanaon ke number likho jinhe tumne jawab mein bataya."""
 
-    resp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.2,
-        response_format={"type": "json_object"},
-    )
-    data = json.loads(resp.choices[0].message.content)
+    data = generate_json(prompt, temperature=0.2)
 
     sources, seen = [], set()
     for n in data.get("used", []):

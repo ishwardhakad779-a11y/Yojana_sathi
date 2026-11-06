@@ -15,13 +15,18 @@ KEYWORDS = {
     "PM Fasal Bima Yojana (PMFBY)": "crop insurance, fasal bima, crop loss, fasal kharab, flood, drought, farmer, kisan, damage compensation",
     "Kisan Credit Card (KCC)": "kisan credit card, farm loan, agricultural credit, cheap loan for farmers, farmer, kisan, kheti ka loan, animal husbandry, fisheries",
     "Sukanya Samriddhi Yojana": "girl child, beti, daughter, savings scheme, bachat, education and marriage, post office account",
-    "Atal Pension Yojana (APY)": "pension, old age, retirement, budhapa, unorganised sector worker, mazdoor, monthly pension at 60",
-    "PM Vishwakarma Yojana": "artisan, craftsperson, carpenter, badhai, blacksmith, lohar, tailor, darzi, potter, barber, traditional trade, toolkit, skill training",
+    "Atal Pension Yojana (APY)": "pension, old age, retirement, budhapa, unorganised sector worker, mazdoor, painter, rangai, driver, monthly pension at 60",
+    "PM Vishwakarma Yojana": "artisan, craftsperson, carpenter, badhai, blacksmith, lohar, tailor, darzi, potter, barber, traditional trade, toolkit, skill training, mochi, painter",
     "PM SVANidhi (Rehri-Patri Loan)": "street vendor, rehri, thela, patri, hawker, vegetable seller, sabzi, small loan, digital payment cashback, interest subsidy",
     "PM Jan Dhan Yojana": "bank account, zero balance account, no bank account, savings account, khata, RuPay card, overdraft, DBT, accident insurance",
     "e-Shram Card": "unorganised worker, labourer, mazdoor, construction worker, migrant worker, accident insurance, PMSBY, UAN, labour card",
     "National Scholarship Portal (NSP) Scholarships": "scholarship, student, education, fees, SC ST OBC minority, padhai, college, school, pre matric, post matric",
     "Stand-Up India": "new business loan, SC ST women entrepreneur, mahila udyami, greenfield enterprise, 10 lakh to 1 crore loan, startup",
+    "Pradhan Mantri Suraksha Bima Yojana (PMSBY)": "accident insurance, durghatna bima, 2 lakh insurance, Rs 20 premium, disability, death cover, bank account",
+    "Pradhan Mantri Jeevan Jyoti Bima Yojana (PMJJBY)": "life insurance, jeevan bima, 2 lakh death cover, Rs 436 annual premium, term insurance, bank account",
+    "Pradhan Mantri Matru Vandana Yojana (PMMVY)": "pregnant women, garbhavati mahila, maternity benefit, 5000 cash, pregnancy, delivery, lactation mother, first child",
+    "PM Shram Yogi Maan-dhan (PM-SYM)": "pension, unorganised worker, mazdoor, monthly 3000 pension, driver, rickshaw, street vendor, small worker, maandhan, old age",
+    "Indira Gandhi National Old Age Pension Scheme (IGNOAPS)": "old age pension, budhapa pension, senior citizen, 60 years old, BPL, garibi rekha, monthly pension, NSAP, buzurg",
 }
 
 

@@ -65,3 +65,10 @@ def search(query: str, k: int = 3):
                 seen.add(d["name"])
                 merged.append(d)
     return merged[: k + 2]
+
+
+def check_health() -> bool:
+    try:
+        return _col.count() > 0
+    except Exception:
+        return False

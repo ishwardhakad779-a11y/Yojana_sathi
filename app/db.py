@@ -1,12 +1,15 @@
 import json
+import logging
 import os
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 
 load_dotenv()
+logger = logging.getLogger("yojana_sathi.db")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 USE_PG = bool(DATABASE_URL)
@@ -14,8 +17,21 @@ SQLITE_PATH = Path(
     os.getenv("SQLITE_PATH", Path(__file__).parent.parent / "data" / "yojana.db")
 )
 
+_pg_pool = None
 if USE_PG:
-    import psycopg
+    try:
+        from psycopg_pool import ConnectionPool
+        # Connection pool for PostgreSQL on Render
+        _pg_pool = ConnectionPool(
+            conninfo=DATABASE_URL,
+            min_size=1,
+            max_size=10,
+            timeout=10,
+            open=False,
+        )
+    except Exception as e:
+        logger.error(f"Failed to initialize PostgreSQL pool: {e}. Falling back to SQLite.")
+        USE_PG = False
 
 
 def enabled() -> bool:
@@ -24,9 +40,10 @@ def enabled() -> bool:
 
 @contextmanager
 def _conn():
-    if USE_PG:
-        with psycopg.connect(DATABASE_URL) as c:
+    if USE_PG and _pg_pool is not None:
+        with _pg_pool.connection() as c:
             yield c
+            c.commit()
     else:
         SQLITE_PATH.parent.mkdir(parents=True, exist_ok=True)
         c = sqlite3.connect(SQLITE_PATH)
@@ -38,13 +55,22 @@ def _conn():
 
 
 def _run(c, query: str, params=()):
-    # SQL mein ? likho, Postgres ke liye %s mein badal jata hai
+    # Convert ? placeholder to %s for Postgres
     if USE_PG:
         query = query.replace("?", "%s")
     return c.execute(query, params)
 
 
 def init_db():
+    global USE_PG
+    if USE_PG and _pg_pool is not None:
+        try:
+            _pg_pool.open()
+            logger.info("PostgreSQL connection pool opened successfully.")
+        except Exception as e:
+            logger.error(f"Could not open PostgreSQL pool: {e}. Reverting to SQLite.")
+            USE_PG = False
+
     with _conn() as c:
         if USE_PG:
             id_col = "BIGSERIAL PRIMARY KEY"
@@ -82,7 +108,26 @@ def init_db():
             c,
             "CREATE INDEX IF NOT EXISTS idx_messages_session ON messages (session_id, id)",
         )
-    print("Database ready:", "Postgres" if USE_PG else f"SQLite ({SQLITE_PATH})")
+    logger.info(f"Database ready: {'Postgres' if USE_PG else f'SQLite ({SQLITE_PATH})'}")
+
+
+def close_db():
+    if _pg_pool is not None:
+        try:
+            _pg_pool.close()
+            logger.info("PostgreSQL connection pool closed.")
+        except Exception as e:
+            logger.warning(f"Error closing PostgreSQL pool: {e}")
+
+
+def check_health() -> bool:
+    try:
+        with _conn() as c:
+            _run(c, "SELECT 1")
+        return True
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        return False
 
 
 def get_session(session_id: str) -> dict:

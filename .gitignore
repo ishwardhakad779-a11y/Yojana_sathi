@@ -7,3 +7,6 @@ __pycache__/
 .vscode/
 .pytest_cache/
 evals/results*.json
+*_diff.txt
+old_*.*
+plans/

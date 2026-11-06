@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: yojana-saathi
+    env: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /healthz
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      # Optional: Link to database if Render Postgres is created:
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: yojana-db
+      #     property: connectionString
+
+# Uncomment below to provision a free PostgreSQL instance on Render:
+# databases:
+#   - name: yojana-db
+#     plan: free
+#     region: oregon

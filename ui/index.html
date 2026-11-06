@@ -183,6 +183,19 @@
             animation-delay: .30s;
         }
 
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        .mic-recording {
+            animation: pulse-ring 1.4s infinite !important;
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #dc2626 !important;
+        }
+
         /* -----------------------------------------------------
            Hero
         ----------------------------------------------------- */
@@ -1776,7 +1789,7 @@
                                     type="text"
                                     autocomplete="off"
                                     enterkeyhint="send"
-                                    placeholder="Apna sawaal likhiye..."
+                                    placeholder="Apna sawaal likhiye ya mic daba kar boliye..."
                                     class="
                                         flex-1
                                         min-w-0
@@ -1797,6 +1810,31 @@
                                     "
                                     aria-label="Apna sawaal likhiye"
                                 >
+
+                                <button
+                                    id="micBtn"
+                                    type="button"
+                                    class="
+                                        shrink-0
+                                        px-3.5
+                                        py-3
+                                        rounded-lg
+                                        border
+                                        border-slate-300
+                                        bg-white
+                                        hover:bg-slate-50
+                                        text-slate-700
+                                        text-sm
+                                        transition
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                    title="Bol kar sawaal puchein (Voice Input)"
+                                    aria-label="Bol kar sawaal puchein"
+                                >
+                                    <span id="micIcon" class="text-base">🎙️</span>
+                                </button>
 
                                 <button
                                     id="sendBtn"
@@ -1953,6 +1991,12 @@
 
         const sendBtn =
             document.getElementById("sendBtn");
+
+        const micBtn =
+            document.getElementById("micBtn");
+
+        const micIcon =
+            document.getElementById("micIcon");
 
         const chatMessages =
             document.getElementById("chatMessages");
@@ -2521,6 +2565,47 @@
 
             messageColumn.appendChild(
                 bubble
+            );
+
+
+            /*
+             * Text-to-Speech Button
+             */
+
+            const speakerBtn =
+                document.createElement("button");
+
+            speakerBtn.className =
+                `
+                    mt-2
+                    inline-flex
+                    items-center
+                    gap-1.5
+                    px-2.5
+                    py-1.5
+                    rounded-md
+                    border
+                    border-slate-200
+                    bg-white
+                    hover:bg-slate-50
+                    text-[10px]
+                    font-semibold
+                    text-slate-600
+                    transition
+                    shadow-sm
+                `;
+
+            speakerBtn.innerHTML =
+                '🔊 Sunen';
+
+            speakerBtn.title =
+                "Is jawab ko sunen (Text-to-Speech)";
+
+            speakerBtn.onclick =
+                () => speakText(answer);
+
+            messageColumn.appendChild(
+                speakerBtn
             );
 
 
@@ -3145,11 +3230,107 @@
 
 
         /* =====================================================
+           SPEECH-TO-TEXT (VOICE INPUT)
+        ====================================================== */
+
+        let recognition = null;
+        let isRecording = false;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+
+            recognition.lang = 'hi-IN';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function() {
+                isRecording = true;
+                micBtn.classList.add('mic-recording');
+                micIcon.textContent = '🔴';
+                micBtn.title = 'Recording... (Click to stop)';
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+                chatInput.focus();
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                if (event.error === 'not-allowed') {
+                    addErrorMessage('Microphone permission nahi mila. Browser settings se permission allow karein.');
+                } else if (event.error === 'no-speech') {
+                    addErrorMessage('Koi awaaz detect nahi hui. Phir se try karein.');
+                } else {
+                    addErrorMessage('Voice input mein dikkat aayi. Phir se try karein.');
+                }
+            };
+
+            recognition.onend = function() {
+                isRecording = false;
+                micBtn.classList.remove('mic-recording');
+                micIcon.textContent = '🎙️';
+                micBtn.title = 'Bol kar sawaal puchein (Voice Input)';
+            };
+
+            micBtn.addEventListener('click', function() {
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.start();
+                    } catch (error) {
+                        console.error('Could not start recognition:', error);
+                    }
+                }
+            });
+        } else {
+            micBtn.disabled = true;
+            micBtn.style.opacity = '0.5';
+            micBtn.title = 'Voice input is sabhi browser mein available nahi hai';
+        }
+
+
+        /* =====================================================
+           TEXT-TO-SPEECH (VOICE OUTPUT)
+        ====================================================== */
+
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) {
+                addErrorMessage('Text-to-speech is browser mein available nahi hai.');
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            utterance.lang = 'hi-IN';
+            utterance.rate = 0.95;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            const hindiVoice = voices.find(voice =>
+                voice.lang === 'hi-IN' || voice.lang.startsWith('hi')
+            );
+
+            if (hindiVoice) {
+                utterance.voice = hindiVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+
+        /* =====================================================
            NO AUTOFOCUS
-           
+
            Deliberately do NOT call:
            chatInput.focus()
-           
+
            This keeps page at the top on first load.
         ====================================================== */
 

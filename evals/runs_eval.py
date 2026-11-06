@@ -1,6 +1,7 @@
 import argparse
 import json
 import re
+import shutil
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -139,6 +140,16 @@ def select_tests(tests, ids, limit):
     return tests
 
 
+def backup_existing():
+    """results.json ko overwrite hone se pehle uski copy rakh lo."""
+    if not RESULTS.exists():
+        return
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dest = RESULTS.with_name(f"results_backup_{stamp}.json")
+    shutil.copy2(RESULTS, dest)
+    print(f"Purana results.json ki copy: {dest.name}")
+
+
 def load_done():
     """Pichle run ke poore hue (bina error wale) results, agar model wahi hai."""
     if not RESULTS.exists():
@@ -177,12 +188,23 @@ def main():
     all_tests = json.loads(QUESTIONS.read_text(encoding="utf-8"))
     tests = select_tests(all_tests, args.ids, args.limit)
 
-    rows = load_done() if args.resume else []
+    backup_existing()
+
+    if args.resume:
+        rows = load_done()
+    elif args.ids:
+        all_done = load_done()
+        wanted_ids = {t["id"] for t in tests}
+        rows = [r for r in all_done if r["id"] not in wanted_ids]
+    else:
+        rows = []
     done_ids = {r["id"] for r in rows}
     todo = [t for t in tests if t["id"] not in done_ids]
 
     if args.resume:
-        print(f"Pehle se hue: {len(done_ids)}, baaki: {len(todo)}")
+        print(f"results.json mein pehle se: {len(done_ids)} sawal. Is run mein baaki: {len(todo)}")
+    if not args.resume and not args.ids and not args.limit:
+        print("Dhyan: --resume ke bina ye results.json ko naye run se bhar dega (purana backup ban chuka hai).")
 
     start = time.time()
     finished = 0
@@ -211,10 +233,10 @@ def main():
 
             with print_lock:
                 if row.get("error"):
-                    print(f"[{t['id']:>2}] ERROR  ({finished}/{len(todo)})")
+                    print(f"[{t['id']:>3}] ERROR  ({finished}/{len(todo)})")
                 else:
                     flag = "PASS" if row["passed"] else "FAIL"
-                    print(f"[{t['id']:>2}] {flag}  ({finished}/{len(todo)})  {t['question'][:50]}")
+                    print(f"[{t['id']:>3}] {flag}  ({finished}/{len(todo)})  {t['question'][:50]}")
                     if not row["passed"]:
                         print(f"      expected : {t['expected']}")
                         print(f"      got      : {row['sources']}")
@@ -235,7 +257,8 @@ def main():
 
     print("\n" + "=" * 52)
     print(f"Model                    : {MODEL}")
-    print(f"Sawal complete           : {len(ok)}/{len(tests)}")
+    print(f"Is run mein hue          : {finished}/{len(todo)}")
+    print(f"results.json mein total  : {len(ok)} sawal")
     print(f"Overall pass             : {pct(sum(r['passed'] for r in rows), len(rows))}")
     print(f"Retrieval recall@6       : {pct(sum(bool(r['retrieval_hit']) for r in scoped), len(scoped))}")
     print(f"Answer hit rate          : {pct(sum(bool(r['answer_hit']) for r in scoped), len(scoped))}")
@@ -248,10 +271,9 @@ def main():
 
     if hit_daily_limit:
         print("\nDaily token limit (TPD) khatam. Ab tak ka kaam results.json mein save hai.")
-        print("Baaki sawal ke liye limit wapas aane ke baad yahi command chalao:")
-        print("   python -m evals.runs_eval --workers 1 --resume")
+        print("Limit wapas aane ke baad wahi command --resume ke saath chalao.")
     else:
-        print("Poora result evals/results.json mein save ho gaya.")
+        print("Result evals/results.json mein save ho gaya.")
 
 
 if __name__ == "__main__":

@@ -1,205 +1,207 @@
 # YojanaSaathi 🇮🇳
 
-**An AI agent that helps people find Indian government schemes they may be eligible for, in simple Hinglish.**
+**A production-ready AI agent that helps Indian citizens discover government welfare schemes in simple Hinglish.**
 
-A user describes their situation in plain language ("Main 25 saal ka hoon, rehri lagata hoon, loan milega?"). The agent asks for any missing details (age, occupation, income), searches a curated scheme database, and answers with the relevant schemes and their **official source links**.
+A user describes their situation in plain language (*"Main 25 saal ka hoon, rehri lagata hoon, loan milega?"*). The agent asks for any missing details (age, occupation, income) through conversational slot-filling, searches a curated scheme database via hybrid retrieval, and answers with relevant schemes and verified **official source links**.
 
-> **Live demo:** https://yojana-saathi-fb30.onrender.com
-> **Note:** the free hosting tier sleeps when idle, so the first load can take about a minute.
-
-<!-- Add a screenshot or GIF here: ![YojanaSaathi demo](docs/demo.gif) -->
+> **Live Demo on Render:** https://yojana-saathi-fb30.onrender.com  
+> *(Hosted on Render free tier — initial wake-up may take ~45s if idle)*
 
 ---
 
-## Why I built this
+## Production Features
 
-Many people do not know which government schemes they qualify for, and official sites are hard to navigate. Most chatbots answer in English and make things up. YojanaSaathi answers in Hinglish, only from a verified scheme database, and always links the official source.
+- **Conversational Slot-Filling:** Built with LangGraph StateGraph — requests age, occupation, and income only when needed.
+- **20 Central Government Schemes:** PM-Kisan, Ayushman Bharat PM-JAY, PM SVANidhi, PM Mudra, Sukanya Samriddhi, Atal Pension (APY), PM Vishwakarma, e-Shram, NSP Scholarships, Stand-Up India, PMAY, PMFBY, PMSBY (Accident Insurance), PMJJBY (Life Insurance), PMMVY (Maternity Benefit), PM-SYM (Labour Pension), IGNOAPS (Old Age Pension), PM Jan Dhan, and PM Ujjwala.
+- **Hybrid Retrieval (Vector + Keyword):** ChromaDB semantic vector search combined with Hinglish token matching so colloquial terms (*kisan, fasal kharab, rehri, patri, mazdoor*) surface the correct schemes.
+- **100% Free LLM Resilience:** Zero-cost architecture powered by Groq API.
+  - Multi-key rotation (`GROQ_API_KEYS=key1,key2`) for double/triple token quotas.
+  - Automatic fallback between active models (`openai/gpt-oss-20b` ➔ `openai/gpt-oss-120b` ➔ `qwen/qwen3.8-27b`).
+  - Adaptive backoff on HTTP 429 rate limits.
+- **API Security & Rate Limiting:**
+  - `slowapi` IP-based rate limiting (25 requests/minute per client).
+  - Pydantic v2 request validation (min 1, max 600 characters) and prompt injection mitigation.
+  - CORS middleware for secure cross-origin browser access.
+- **Persistent Storage with Connection Pooling:**
+  - PostgreSQL support with `psycopg_pool.ConnectionPool` for Render Managed Postgres.
+  - Graceful fallback to local SQLite for local development.
+- **Observability & Health Checks:**
+  - Liveness probe at `/health`.
+  - Deep readiness probe at `/healthz` verifying database connectivity and ChromaDB index readiness.
+  - Graceful fallback responses on upstream overload (no raw 500 tracebacks).
+- **Hardened Containerization & Deployment:**
+  - Non-root user (`appuser`), bytecode pre-compilation, and Docker container healthchecks.
+  - Infrastructure-as-Code with `render.yaml` for 1-click Render deployment.
+- **100-Question Evaluation Suite:**
+  - Automated evaluation harness with resumption support, multi-turn testing, and strict negative filtering.
 
-## Features
-
-- **Conversational slot-filling:** the agent asks for age, occupation and income one at a time, only when needed.
-- **15 central government schemes** (PM-Kisan, Ayushman Bharat, PM SVANidhi, Mudra, Sukanya Samriddhi, Atal Pension, PM Vishwakarma, e-Shram, NSP scholarships, Stand-Up India and more).
-- **Grounded answers:** the LLM answers only from retrieved scheme text and returns official source links.
-- **Hybrid retrieval:** vector search + keyword matching (see below for why).
-- **Out-of-scope refusal:** questions like "Bitcoin mein paisa kaise lagayein?" get no scheme recommendations.
-- **Session memory:** profile and chat history are stored per session (SQLite by default, Postgres via `DATABASE_URL`).
-- **Evaluation suite:** a 20-question eval set with retrieval and answer metrics.
-- **Dockerized**, with a single-service setup (FastAPI serves the UI too).
+---
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-    U["User (index.html, Tailwind)"] --> API["FastAPI: POST /ask"]
-    API --> P["extract_profile (LLM -> JSON)"]
-    P -->|greeting| G["greet"]
-    P -->|eligibility, details missing| Q["ask follow-up question"]
-    P -->|ready| R["retrieve: hybrid search"]
-    R --> A["answer (LLM picks schemes by number)"]
-    A --> DB[("SQLite / Postgres")]
-    G --> DB
-    Q --> DB
-    DB --> U
+    U["User (Web UI / Mobile)"] -->|HTTPS| API["FastAPI Gateway"]
+    API -->|Rate Limit / Sanitization| LG["LangGraph Agent"]
+    
+    subgraph Agent Loop
+        LG --> P["extract_profile (LLM -> JSON)"]
+        P -->|greeting| G["greet"]
+        P -->|incomplete profile| Q["ask follow-up question"]
+        P -->|profile ready| R["retrieve: Hybrid Search"]
+        R --> A["answer (Index-grounded LLM)"]
+    end
+    
+    R --> Chroma[("ChromaDB Vector Store")]
+    LG <--> DB[("PostgreSQL Pool / SQLite")]
+    A --> U
 ```
 
-**Agent flow (LangGraph):**
+---
 
-1. `extract_profile`: pulls age, occupation, income, state, gender and intent out of the message and merges it with the saved profile.
-2. A router decides: greet, ask a follow-up, or retrieve.
-3. `retrieve`: rewrites the Hinglish question into a short English query, then runs hybrid search.
-4. `answer`: the LLM writes the reply and returns the **numbers** of the schemes it used, so sources are mapped by index instead of fragile exact-name matching.
+## Tech Stack
 
-## Tech stack
-
-| Layer | Tech |
+| Layer | Technology |
 |---|---|
-| Backend | FastAPI, Uvicorn |
-| Agent | LangGraph |
-| LLM | Groq (currently `openai/gpt-oss-20b`) |
-| Retrieval | ChromaDB (vector) + keyword matching |
-| Storage | SQLite (default), Postgres (optional via `DATABASE_URL`) |
-| Frontend | HTML, Tailwind CSS (CDN), vanilla JavaScript |
-| Packaging | Docker |
+| **Backend & API** | FastAPI, Uvicorn, SlowAPI, Pydantic v2 |
+| **Agent Framework** | LangGraph (StateGraph) |
+| **LLM Inference** | Groq (`openai/gpt-oss-20b`, `openai/gpt-oss-120b`, `qwen/qwen3.8-27b`) |
+| **Retrieval (RAG)** | ChromaDB (Vector) + Keyword token overlap |
+| **Database** | PostgreSQL (`psycopg` + `psycopg_pool`) / SQLite |
+| **Deployment** | Docker, Render Blueprint (`render.yaml`) |
+| **Frontend** | HTML5, Tailwind CSS, Vanilla JavaScript |
 
-## Evaluation
+---
 
-I built a 20-question eval set: 17 in-scope questions with an expected scheme, and 3 out-of-scope questions where the agent should recommend nothing. A question passes only if the expected scheme is in the answer **and** no wrong scheme is listed.
+## Evaluation Benchmark
 
-| Metric | v1 (vector search only) | v2 (keywords + index-based sources) | v3 (hybrid search) |
-|---|---|---|---|
-| Overall pass | 50% (10/20) | 80% (16/20) | 100% (20/20) |
-| Retrieval recall@5 | 64% | 76% | 100% |
-| Answer hit rate | 52% | 76% | 100% |
-| Clean (no wrong scheme) | 76% | 100% | 100% |
-| Out-of-scope refused | 100% | 100% | 100% |
+The project includes an automated eval runner (`evals/runs_eval.py`) across a **100-question test suite** (`evals/test_questions.json`):
 
-**What I found and fixed**
+| Category | Count | Description |
+|---|---|---|
+| **In-Scope Profile Queries** | 40 | Realistic citizen queries with complete/partial profiles |
+| **Direct Scheme Questions** | 18 | Direct inquiries (*"Ayushman card kaise banta hai?"*) |
+| **Out-of-Scope Guardrails** | 13 | Negative tests (*"Crypto", "Train ticket", "Tractor advice"*) |
+| **Missing Info Clarifications** | 9 | Ambiguous queries requiring slot-filling (*"Mujhe yojana chahiye"*) |
+| **Multi-Turn Slot-Filling** | 8 | Conversational multi-turn dialogues |
+| **English & Bilingual Queries** | 12 | Mixed Hinglish & English questions |
 
-- The embedding model is English-centric, but the data and questions are Hinglish. Words like "rehri" or "kisan" did not retrieve the right scheme, which capped retrieval recall at 64%.
-- Fix 1: added English and Hinglish keywords to every scheme document.
-- Fix 2: the LLM now returns scheme numbers instead of exact names, which removed most "source mismatch" failures.
-- Fix 3: hybrid retrieval, combining vector search with keyword matching, so "kisan fasal kharab" reliably surfaces PM Fasal Bima, PM-Kisan and KCC.
-
-**Honest caveats**
-
-- The eval set is small (20 questions), and I tuned the system while looking at its failures, so 100% is a **development-set** score, not a measure of real-world accuracy.
-- I also rewrote 4 test questions after the first run (two were too strict, two lacked the details the agent needs), so v1 and v3 are not a perfectly fair comparison.
-- Next step: a held-out set of unseen questions written by other people.
-
-Run it yourself:
+Run the eval suite:
 
 ```bash
-python -m evals.runs_eval
+# Run all tests (resumable on rate limits)
+python -m evals.runs_eval --resume
+
+# Run specific IDs
+python -m evals.runs_eval --ids 15,16,26,27,97
 ```
 
-## Project structure
+---
 
-```
-yojana-saathi/
-├── app/
-│   ├── main.py            # FastAPI app, serves UI + /ask
-│   ├── db.py              # SQLite / Postgres storage
-│   ├── agent/
-│   │   ├── graph.py       # LangGraph wiring
-│   │   └── nodes.py       # profile extraction, routing, answer
-│   ├── rag/
-│   │   ├── ingest.py      # builds the search index + keywords
-│   │   └── retriever.py   # hybrid search
-│   └── schemes/
-│       └── schemes.json   # scheme data
-├── ui/index.html          # chat UI
-├── evals/
-│   ├── test_questions.json
-│   └── runs_eval.py
-├── Dockerfile
-├── requirements.txt
-└── .env.example
-```
+## Local Development
 
-## Run locally
-
-**1. Clone and install**
+### 1. Clone & Setup Virtual Environment
 
 ```bash
 git clone https://github.com/<your-username>/yojana-saathi.git
 cd yojana-saathi
 python -m venv venv
-venv\Scripts\activate          # Mac/Linux: source venv/bin/activate
+venv\Scripts\activate          # Windows PowerShell / CMD
+# source venv/bin/activate     # Mac / Linux
 pip install -r requirements.txt
 ```
 
-**2. Add your Groq API key** (free at console.groq.com)
+### 2. Configure Environment
 
 ```bash
-copy .env.example .env         # Mac/Linux: cp .env.example .env
-# then edit .env and set GROQ_API_KEY=...
+cp .env.example .env
+```
+Edit `.env`:
+```ini
+GROQ_API_KEY=gsk_your_groq_api_key_here
+# Optional: Multiple keys for free rotation:
+# GROQ_API_KEYS=gsk_key1,gsk_key2
 ```
 
-**3. Build the search index and start the server**
+### 3. Ingest Scheme Data & Start Server
 
 ```bash
 python -m app.rag.ingest
 uvicorn app.main:app --reload
 ```
 
-Open **http://127.0.0.1:8000**.
-
-## Run with Docker
-
-```bash
-docker build -t yojana-saathi .
-docker run --env-file .env -p 8000:8000 yojana-saathi
-```
-
-## API
-
-`POST /ask`
-
-```json
-{ "question": "Meri umar 25 hai, rehri lagata hoon, loan milega?", "session_id": "abc123" }
-```
-
-Response:
-
-```json
-{
-  "answer": "PM SVANidhi: ...",
-  "profile": { "age": 25, "occupation": "street vendor" },
-  "sources": [{ "name": "PM SVANidhi (Rehri-Patri Loan)", "url": "https://pmsvanidhi.mohua.gov.in" }]
-}
-```
-
-Other endpoints: `GET /history/{session_id}`, `GET /health`.
-
-## Configuration
-
-| Variable | Required | Purpose |
-|---|---|---|
-| `GROQ_API_KEY` | Yes | LLM access |
-| `DATABASE_URL` | No | If set, uses Postgres instead of SQLite |
-| `SQLITE_PATH` | No | Custom SQLite file location |
-
-## Known limitations
-
-- **Eligibility is LLM-judged, not rule-based.** The agent can say "you may be eligible" without checking every rule (for example land records for PM-Kisan). It currently asks for age, occupation and income even when a scheme does not need all three.
-- **Scheme data is a summary** from public sources and **may be outdated.** Rules, amounts and deadlines change. Always verify on the official site before applying.
-- Only **15 central schemes**; no state-specific schemes yet.
-- With SQLite on a free host, chat history is lost when the server restarts.
-- Hinglish spelling variations ("rehri", "rehdi") can still miss the keyword match.
-
-## Roadmap
-
-- [ ] Rule-based eligibility checks per scheme (age, income, category, land)
-- [ ] Held-out eval set and a larger question bank
-- [ ] Postgres + deployment on AWS (ECS, RDS)
-- [ ] CI with GitHub Actions (run evals on every push)
-- [ ] State-level schemes and Hindi (Devanagari) input
-- [ ] Tracing and cost/latency monitoring
-
-## Disclaimer
-
-YojanaSaathi provides general information only and is not an official government service. Verify eligibility, documents and deadlines on the official website before applying.
+Open **http://127.0.0.1:8000** in your browser.
 
 ---
 
-Built by **Ishwar Dhakad**. Backend, agent, evaluation and deployment are my work; I used AI assistance for code generation and the frontend.
+## Deployment on Render
+
+### Option A: Using Render Blueprint (`render.yaml`)
+1. Push your repository to GitHub.
+2. In the [Render Dashboard](https://dashboard.render.com), click **New +** ➔ **Blueprint**.
+3. Select this repository. Render will automatically detect `render.yaml` and configure the Docker service with `/healthz` healthchecks.
+4. Set the `GROQ_API_KEY` secret in your service settings.
+
+### Option B: Docker Container
+```bash
+docker build -t yojana-saathi .
+docker run -p 8000:8000 --env-file .env yojana-saathi
+```
+
+---
+
+## API Documentation
+
+### `POST /ask`
+Submit a question to the conversational agent.
+
+```json
+{
+  "question": "Main 25 saal ka hoon, thela lagata hoon, loan milega?",
+  "session_id": "session-101"
+}
+```
+
+**Response (HTTP 200):**
+```json
+{
+  "answer": "PM SVANidhi: Street vendors ke liye bina guarantee loan milta hai...",
+  "profile": {
+    "age": 25,
+    "occupation": "street vendor"
+  },
+  "sources": [
+    {
+      "name": "PM SVANidhi (Rehri-Patri Loan)",
+      "url": "https://pmsvanidhi.mohua.gov.in"
+    }
+  ]
+}
+```
+
+### Other Endpoints:
+- `GET /health` — Basic service liveness check.
+- `GET /healthz` — Deep readiness probe (checks database and vector store health).
+- `GET /history/{session_id}` — Fetch conversation chat history.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `GROQ_API_KEY` | Yes | Primary Groq API Key |
+| `GROQ_API_KEYS` | No | Comma-separated Groq API keys for automated rotation |
+| `GROQ_MODEL` | No | Primary model ID (default: `openai/gpt-oss-20b`) |
+| `DATABASE_URL` | No | PostgreSQL connection URL (e.g. Render Postgres) |
+| `ALLOWED_ORIGINS`| No | CORS allowed origins (default: `*`) |
+
+---
+
+## Disclaimer
+
+YojanaSaathi provides general informational assistance and is not an official government portal. Users must verify official guidelines, required documentation, and deadlines on official government websites before applying.
+
+---
+
+Built with pride by **Ishwar Dhakad**.
