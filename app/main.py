@@ -1,6 +1,9 @@
 import logging
 import os
+import time
+import uuid
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from typing import List, Optional
 
@@ -16,12 +19,15 @@ from app import db
 from app.agent.graph import build_graph
 from app.rag import retriever
 
-# Configure production logging
+# Configure structured logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    format="%(asctime)s [%(levelname)s] %(name)s [%(request_id)s]: %(message)s",
 )
 logger = logging.getLogger("yojana_sathi.api")
+
+# Context variable for request correlation
+request_id_ctx: ContextVar[str] = ContextVar("request_id", default="none")
 
 UI_FILE = Path(__file__).parent.parent / "ui" / "index.html"
 
@@ -61,6 +67,36 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Request logging middleware with correlation IDs
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Add request correlation ID and log all requests with timing."""
+    req_id = request.headers.get("X-Request-ID", str(uuid.uuid4())[:8])
+    request_id_ctx.set(req_id)
+
+    # Inject request_id into logging context
+    old_factory = logging.getLogRecordFactory()
+
+    def record_factory(*args, **kwargs):
+        record = old_factory(*args, **kwargs)
+        record.request_id = request_id_ctx.get()
+        return record
+
+    logging.setLogRecordFactory(record_factory)
+
+    start_time = time.time()
+    response = await call_next(request)
+    duration_ms = round((time.time() - start_time) * 1000, 2)
+
+    logger.info(
+        f"{request.method} {request.url.path} - {response.status_code} - {duration_ms}ms"
+    )
+
+    response.headers["X-Request-ID"] = req_id
+    return response
+
 
 agent = build_graph()
 

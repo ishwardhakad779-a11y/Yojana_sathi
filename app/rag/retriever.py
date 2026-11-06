@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 import chromadb
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from app.rag.ingest import KEYWORDS
 
@@ -46,14 +47,46 @@ def _keyword_search(query: str, k: int) -> list:
 
 
 def _vector_search(query: str, k: int) -> list:
-    res = _col.query(query_texts=[query], n_results=k)
-    return [
-        {"text": doc, "name": meta["name"], "url": meta["url"]}
-        for doc, meta in zip(res["documents"][0], res["metadatas"][0])
-    ]
+    """
+    Perform vector search with retry logic for transient failures.
+
+    Args:
+        query: Search query string
+        k: Number of results to return
+
+    Returns:
+        List of documents with text, name, and url
+    """
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=10),
+        retry=retry_if_exception_type(Exception)
+    )
+    def _search_with_retry():
+        res = _col.query(query_texts=[query], n_results=k)
+        return [
+            {"text": doc, "name": meta["name"], "url": meta["url"]}
+            for doc, meta in zip(res["documents"][0], res["metadatas"][0])
+        ]
+
+    try:
+        return _search_with_retry()
+    except Exception:
+        # Fallback to empty results on persistent failure
+        return []
 
 
 def search(query: str, k: int = 3):
+    """
+    Hybrid search combining keyword matching and vector search.
+
+    Args:
+        query: Search query string
+        k: Number of results to return
+
+    Returns:
+        List of unique documents merged from both search methods
+    """
     kw = _keyword_search(query, k)
     vec = _vector_search(query, k)
 
@@ -68,6 +101,12 @@ def search(query: str, k: int = 3):
 
 
 def check_health() -> bool:
+    """
+    Check if ChromaDB vector store is healthy.
+
+    Returns:
+        True if collection has documents, False otherwise
+    """
     try:
         return _col.count() > 0
     except Exception:

@@ -28,10 +28,32 @@ class State(TypedDict, total=False):
 
 
 def missing(profile: dict):
+    """
+    Check which required profile fields are missing.
+
+    Args:
+        profile: User profile dictionary
+
+    Returns:
+        List of missing required field keys
+    """
     return [k for k in REQUIRED if profile.get(k) in (None, "")]
 
 
 def extract_profile(state: State):
+    """
+    Extract user profile information from the current message using LLM.
+
+    Parses age, occupation, income, state, gender, and intent from user's
+    Hinglish message. Preserves existing profile fields and only updates
+    new information.
+
+    Args:
+        state: Current conversation state with question and profile
+
+    Returns:
+        Updated state with extracted profile and intent
+    """
     old = state.get("profile", {})
     prompt = f"""User ka message padho aur sirf JSON do.
 Keys:
@@ -71,6 +93,15 @@ SCHEME_WORDS = [
 
 
 def route(state: State):
+    """
+    Route conversation to appropriate node based on intent and profile completeness.
+
+    Args:
+        state: Current conversation state with intent, question, and profile
+
+    Returns:
+        Next node name: "greet", "ask", or "retrieve"
+    """
     if state["intent"] == "greeting":
         return "greet"
 
@@ -83,6 +114,16 @@ def route(state: State):
     return "retrieve"
 
 def greet(state: State):
+    """
+    Generate greeting message.
+
+    Args:
+        state: Current conversation state (unused but required by LangGraph)
+
+    Returns:
+        State update with greeting reply
+    """
+    _ = state  # Acknowledge parameter for LangGraph signature
     return {
         "reply": (
             "Namaste! Main YojanaSaathi hoon. Aap mujhse kisi sarkari yojana ke baare mein "
@@ -94,6 +135,15 @@ def greet(state: State):
 
 
 def ask(state: State):
+    """
+    Ask follow-up question for missing profile information.
+
+    Args:
+        state: Current conversation state with profile and question
+
+    Returns:
+        State update with follow-up question
+    """
     field = missing(state["profile"])[0]
     return {
         "reply": f"Aapke liye sahi yojana dhoondhne ke liye mujhe thodi jaankari chahiye. Bataiye, {REQUIRED[field]}?",
@@ -103,7 +153,18 @@ def ask(state: State):
 
 
 def build_query(topic: str, profile: dict) -> str:
-    """Hinglish sawal ko chhoti English search query mein badalta hai."""
+    """
+    Build English search query from Hinglish user input.
+
+    Translates Hinglish terms to English for better RAG retrieval.
+
+    Args:
+        topic: User's question/topic in Hinglish
+        profile: User profile dictionary
+
+    Returns:
+        Optimized English search query (max 12 words)
+    """
     prompt = f"""Neeche user ka sawal aur profile hai. Isse ek chhoti ENGLISH search query banao
 (max 12 words) jo sarkari yojana dhoondhne ke kaam aaye. Hinglish shabdon ko English mein badlo
 (jaise rehri/thela/patri = street vendor, kisan = farmer, beti = girl child,
@@ -120,6 +181,15 @@ Profile: {json.dumps(profile, ensure_ascii=False)}"""
 
 
 def retrieve(state: State):
+    """
+    Retrieve relevant scheme documents using hybrid search.
+
+    Args:
+        state: Current conversation state with question and profile
+
+    Returns:
+        State update with retrieved documents
+    """
     profile = state.get("profile", {})
     topic = state.get("topic") or state["question"]
     query = build_query(topic, profile)
@@ -138,6 +208,15 @@ def retrieve(state: State):
 
 
 def answer(state: State):
+    """
+    Generate final answer using LLM with retrieved context.
+
+    Args:
+        state: Current conversation state with docs, profile, and question
+
+    Returns:
+        State update with answer reply and source citations
+    """
     docs = state["docs"]
     topic = state.get("topic") or state["question"]
     context = "\n\n".join(f"[{i + 1}] {d['text']}" for i, d in enumerate(docs))

@@ -35,11 +35,21 @@ if USE_PG:
 
 
 def enabled() -> bool:
+    """Check if database is enabled (always True)."""
     return True
 
 
 @contextmanager
 def _conn():
+    """
+    Context manager for database connections with automatic pooling.
+
+    Uses PostgreSQL connection pool when DATABASE_URL is set,
+    otherwise falls back to SQLite.
+
+    Yields:
+        Database connection object
+    """
     if USE_PG and _pg_pool is not None:
         with _pg_pool.connection() as c:
             yield c
@@ -55,6 +65,17 @@ def _conn():
 
 
 def _run(c, query: str, params=()):
+    """
+    Execute SQL query with database-agnostic placeholder conversion.
+
+    Args:
+        c: Database connection
+        query: SQL query string
+        params: Query parameters tuple
+
+    Returns:
+        Cursor object after execution
+    """
     # Convert ? placeholder to %s for Postgres
     if USE_PG:
         query = query.replace("?", "%s")
