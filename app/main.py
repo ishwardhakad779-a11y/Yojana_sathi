@@ -40,8 +40,6 @@ request_id_ctx: ContextVar[str] = ContextVar("request_id", default="none")
 
 UI_FILE = Path(__file__).parent.parent / "ui" / "index.html"
 
-ADMIN_UI_FILE = Path(__file__).parent.parent / "ui" / "admin.html"
-
 # Rate limiter: default 20 requests per minute per IP
 limiter = Limiter(key_func=get_remote_address)
 
@@ -148,29 +146,6 @@ def home():
     if not UI_FILE.exists():
         raise HTTPException(status_code=404, detail="UI file not found")
     return FileResponse(UI_FILE)
-
-
-@app.get("/admin")
-def admin():
-    if not ADMIN_UI_FILE.exists():
-        raise HTTPException(status_code=404, detail="Admin UI file not found")
-    return FileResponse(ADMIN_UI_FILE)
-
-
-class AdminLogin(BaseModel):
-    username: str
-    password: str
-
-
-@app.post("/admin/login")
-def admin_login(req: AdminLogin):
-    """Simple admin login - in production use proper auth"""
-    admin_user = os.getenv("ADMIN_USER", "admin")
-    admin_pass = os.getenv("ADMIN_PASSWORD", "admin123")
-
-    if req.username == admin_user and req.password == admin_pass:
-        return {"success": True, "message": "Login successful"}
-    return {"success": False, "message": "Invalid credentials"}
 
 
 @app.get("/health")

@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YojanaSaathi | Sarkari Yojana Assistant</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+    </style>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -26,10 +24,6 @@
             }
         }
     </script>
-    <style>
-        .hero-pattern { background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); }
-        .shadow-soft { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); }
-    </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
 
@@ -43,37 +37,8 @@
                     <span class="text-xs text-slate-500">Sarkari Yojana Assistant</span>
                 </div>
             </div>
-            <!-- Secret Admin Trigger (5 clicks) -->
-            <div class="hidden md:flex items-center gap-2">
-                <span id="adminTrigger" class="text-xs text-slate-400 cursor-pointer hover:text-navy-600">admin (<span id="counter">0</span>/5)</span>
-            </div>
         </div>
     </header>
-
-    <!-- Admin Login Modal -->
-    <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl">
-            <h2 class="text-lg font-bold text-navy-900 mb-4 text-center">Admin Login</h2>
-            <div class="space-y-3">
-                <input type="text" id="adminUsername" placeholder="Username" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-navy-500">
-                <input type="password" id="adminPassword" placeholder="Password" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-navy-500">
-                <button onclick="adminLogin()" class="w-full bg-navy-600 hover:bg-navy-700 text-white font-medium py-2 rounded-lg text-sm">Login</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Dashboard -->
-    <div id="adminDashboard" class="hidden">
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            <div class="bg-white rounded-2xl p-4 shadow-xl">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-lg font-bold text-navy-900">Admin Dashboard</h3>
-                    <button onclick="logoutAdmin()" class="text-slate-500 hover:text-navy-600 text-sm">Logout</button>
-                </div>
-                <div id="adminStats" class="text-center py-8">Loading...</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8">
@@ -83,71 +48,5 @@
         </div>
     </main>
 
-    <!-- Simple Admin Script -->
-    <script>
-        let adminClickCount = 0;
-
-        function initAdminTrigger() {
-            const trigger = document.getElementById('adminTrigger');
-            if (!trigger) return;
-            trigger.addEventListener('click', e => {
-                e.stopPropagation();
-                adminClickCount++;
-                document.getElementById('counter').textContent = adminClickCount;
-                if (adminClickCount >= 5) {
-                    showAdminModal();
-                    adminClickCount = 0;
-                    document.getElementById('counter').textContent = '0';
-                } else {
-                    setTimeout(() => { adminClickCount = 0; document.getElementById('counter').textContent = '0'; }, 3000);
-                }
-            });
-        }
-
-        function showAdminModal() {
-            document.getElementById('adminModal').classList.remove('hidden');
-            adminClickCount = 0;
-        }
-
-        function closeAdminModal() {
-            document.getElementById('adminModal').classList.add('hidden');
-        }
-
-        function adminLogin() {
-            const username = document.getElementById('adminUsername').value.trim();
-            const password = document.getElementById('adminPassword').value;
-            if (!username || !password) { alert('Username aur password dalein'); return; }
-            // Demo mode - accept any credentials for testing
-            const confirmed = confirm(`Login as "${username}"?`);
-            if (confirmed) {
-                document.getElementById('adminModal').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                loadAdminStats();
-            }
-        }
-
-        function loadAdminStats() {
-            document.getElementById('adminStats').innerHTML = `
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-navy-50 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-navy-900">1,234</p>
-                        <p class="text-xs text-slate-600">Total Users</p>
-                    </div>
-                    <div class="bg-navy-50 p-4 rounded-lg text-center">
-                        <p class="text-2xl font-bold text-navy-900">2,567</p>
-                        <p class="text-xs text-slate-600">Total Questions</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function logoutAdmin() {
-            document.getElementById('adminDashboard').classList.add('hidden');
-            document.getElementById('adminUsername').value = '';
-            document.getElementById('adminPassword').value = '';
-        }
-
-        document.addEventListener('DOMContentLoaded', initAdminTrigger);
-    </script>
 </body>
 </html>
