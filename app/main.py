@@ -157,85 +157,20 @@ def admin():
     return FileResponse(ADMIN_UI_FILE)
 
 
-class OtpRequest(BaseModel):
-    email: str = Field(default="", max_length=254)
-    phone: str = Field(default="", max_length=20)
+class AdminLogin(BaseModel):
+    username: str
+    password: str
 
 
-@app.post("/admin/otp-email")
-def send_otp_email(req: OtpRequest):
-    """Generate and send OTP for email verification"""
-    import random
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
+@app.post("/admin/login")
+def admin_login(req: AdminLogin):
+    """Simple admin login - in production use proper auth"""
+    admin_user = os.getenv("ADMIN_USER", "admin")
+    admin_pass = os.getenv("ADMIN_PASSWORD", "admin123")
 
-    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-
-    # Store OTP temporarily (in production use Redis/database)
-    logger.info(f"OTP for {req.email}: {otp}")
-
-    # Try to send real email via SMTP
-    smtp_host = os.getenv("SMTP_HOST", "")
-    smtp_port = int(os.getenv("SMTP_PORT", "587"))
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-
-    email_sent = False
-    if smtp_host and smtp_user and smtp_pass:
-        try:
-            msg = MIMEMultipart()
-            msg['From'] = smtp_user
-            msg['To'] = req.email
-            msg['Subject'] = "YojanaSaathi - Admin Login OTP"
-
-            body = f"""
-            Namaste,
-
-            Aapke YojanaSaathi admin login ke liye OTP hai:
-            {otp}
-
-            Ye OTP 5 minute ke liye valid hai.
-
-            Agar aapne yeh request nahi kiya hai, toh yeh email ignore karein.
-
-            - YojanaSaathi Team
-            """
-            msg.attach(MIMEText(body, 'plain'))
-
-            with smtplib.SMTP(smtp_host, smtp_port) as server:
-                server.starttls()
-                server.login(smtp_user, smtp_pass)
-                server.send_message(msg)
-
-            email_sent = True
-            logger.info(f"OTP email sent to {req.email}")
-        except Exception as e:
-            logger.error(f"Failed to send OTP email: {e}")
-
-    return {
-        "message": f"OTP sent to {req.email}" if email_sent else f"OTP generated (check console: {otp})",
-        "otp": otp,  # Remove in production!
-        "expires_in": 300
-    }
-
-
-@app.post("/admin/otp-phone")
-def send_otp_phone(req: OtpRequest):
-    """Generate OTP for phone verification"""
-    import random
-
-    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-
-    logger.info(f"OTP for {req.phone}: {otp}")
-
-    # In production, use Twilio/MSG91/Nexmo
-    # For now, log to console and return OTP for testing
-    return {
-        "message": f"SMS sent to {req.phone}",
-        "otp": otp,  # Remove in production!
-        "expires_in": 300
-    }
+    if req.username == admin_user and req.password == admin_pass:
+        return {"success": True, "message": "Login successful"}
+    return {"success": False, "message": "Invalid credentials"}
 
 
 @app.get("/health")
