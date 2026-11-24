@@ -241,9 +241,9 @@ def admin_stats(password: str):
     Returns:
         JSON with user stats, top schemes, recent questions
     """
-    # Simple password check
-    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "yojana_admin_2026")
-    if password != ADMIN_PASSWORD:
+    # Password check - must be set in environment
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+    if not ADMIN_PASSWORD or password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
