@@ -157,6 +157,46 @@ def admin():
     return FileResponse(ADMIN_UI_FILE)
 
 
+class OtpRequest(BaseModel):
+    email: str = Field(default="", max_length=254)
+    phone: str = Field(default="", max_length=20)
+
+
+@app.post("/admin/otp-email")
+def send_otp_email(req: OtpRequest):
+    """Generate OTP for email verification (demo mode - emails logged to console)"""
+    import random
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+
+    # In production, send actual email SMTP/SendGrid/etc
+    # For now, log to console and store in session
+    logger.info(f"OTP for {req.email}: {otp}")
+
+    # Store OTP temporarily (in production use Redis/database)
+    return {
+        "message": f"OTP sent to {req.email}",
+        "otp": otp,  # Remove in production!
+        "expires_in": 300
+    }
+
+
+@app.post("/admin/otp-phone")
+def send_otp_phone(req: OtpRequest):
+    """Generate OTP for phone verification (demo mode)"""
+    import random
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+
+    # In production, use Twilio/MSG91/Nexmo
+    # For demo, log to console
+    logger.info(f"OTP for {req.phone}: {otp}")
+
+    return {
+        "message": f"SMS sent to {req.phone}",
+        "otp": otp,  # Remove in production!
+        "expires_in": 300
+    }
+
+
 @app.get("/health")
 def health():
     return {"status": "YojanaSaathi chal raha hai"}
