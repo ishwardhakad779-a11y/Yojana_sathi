@@ -623,14 +623,28 @@
             }
             document.getElementById('emailOtpSection').classList.remove('hidden');
 
-            // Simulate OTP request
             fetch('/admin/otp-email', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({email})
-            }).catch(err => {
-                // For demo - show success
-                alert('OTP email par bhej diya gaya (demo mode)');
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.otp) {
+                    // Show OTP for testing/demo
+                    const otp = data.otp;
+                    document.getElementById('otpCode1').value = otp[0];
+                    document.getElementById('otpCode2').value = otp[1];
+                    document.getElementById('otpCode3').value = otp[2];
+                    document.getElementById('otpCode4').value = otp[3];
+                    document.getElementById('otpCode5').value = otp[4];
+                    document.getElementById('otpCode6').value = otp[5];
+                    alert(`Demo OTP: ${otp}\n\n(In production, this would be sent to your email)`);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('OTP bhejne mein error hua');
             });
         }
 
@@ -646,9 +660,24 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({phone})
-            }).catch(err => {
-                // For demo - show success
-                alert('OTP SMS par bhej diya gaya (demo mode)');
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.otp) {
+                    // Show OTP for testing/demo
+                    const otp = data.otp;
+                    document.getElementById('otpP1').value = otp[0];
+                    document.getElementById('otpP2').value = otp[1];
+                    document.getElementById('otpP3').value = otp[2];
+                    document.getElementById('otpP4').value = otp[3];
+                    document.getElementById('otpP5').value = otp[4];
+                    document.getElementById('otpP6').value = otp[5];
+                    alert(`Demo OTP: ${otp}\n\n(In production, this would be sent via SMS)`);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('OTP bhejne mein error hua');
             });
         }
 
