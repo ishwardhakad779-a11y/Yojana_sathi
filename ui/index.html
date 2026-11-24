@@ -2894,12 +2894,16 @@
                             body: JSON.stringify({
                                 question:
                                     cleaned,
+                                is_voice: isVoiceInput, // Track if voice was used
 
                                 session_id:
                                     sessionId
                             })
                         }
                     );
+
+                // Reset voice input flag after sending
+                isVoiceInput = false;
 
 
                 if (!response.ok) {
@@ -2973,6 +2977,9 @@
                 );
 
             } finally {
+
+                // Ensure voice flag is reset even on error
+                isVoiceInput = false;
 
                 setLoading(
                     false
@@ -3230,6 +3237,12 @@
 
 
         /* =====================================================
+           VOICE INPUT TRACKING
+        ====================================================== */
+
+        let isVoiceInput = false;
+
+        /* =====================================================
            SPEECH-TO-TEXT (VOICE INPUT)
         ====================================================== */
 
@@ -3246,6 +3259,7 @@
 
             recognition.onstart = function() {
                 isRecording = true;
+                isVoiceInput = true; // Mark that voice input is being used
                 micBtn.classList.add('mic-recording');
                 micIcon.textContent = '🔴';
                 micBtn.title = 'Recording... (Click to stop)';

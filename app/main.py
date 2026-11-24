@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import time
@@ -20,16 +21,26 @@ from app.agent.graph import build_graph
 from app.rag import retriever
 
 # Configure structured logging
+class RequestIdFilter(logging.Filter):
+    """Inject request_id into every log record, defaulting to 'none'."""
+    def filter(self, record):
+        if not hasattr(record, "request_id"):
+            record.request_id = "none"
+        return True
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s [%(request_id)s]: %(message)s",
 )
+logging.getLogger().addFilter(RequestIdFilter())
 logger = logging.getLogger("yojana_sathi.api")
 
 # Context variable for request correlation
 request_id_ctx: ContextVar[str] = ContextVar("request_id", default="none")
 
 UI_FILE = Path(__file__).parent.parent / "ui" / "index.html"
+
+ADMIN_UI_FILE = Path(__file__).parent.parent / "ui" / "admin.html"
 
 # Rate limiter: default 20 requests per minute per IP
 limiter = Limiter(key_func=get_remote_address)
@@ -114,6 +125,8 @@ class Question(BaseModel):
         description="Unique session identifier for multi-turn conversations",
     )
 
+    is_voice: bool = Field(default=False, description="Whether the question was asked via voice")
+
     @field_validator("question")
     @classmethod
     def validate_question(cls, v: str) -> str:
@@ -135,6 +148,13 @@ def home():
     if not UI_FILE.exists():
         raise HTTPException(status_code=404, detail="UI file not found")
     return FileResponse(UI_FILE)
+
+
+@app.get("/admin")
+def admin():
+    if not ADMIN_UI_FILE.exists():
+        raise HTTPException(status_code=404, detail="Admin UI file not found")
+    return FileResponse(ADMIN_UI_FILE)
 
 
 @app.get("/health")
@@ -185,7 +205,7 @@ def ask_endpoint(request: Request, q: Question):
             result["intent"],
             result.get("topic", ""),
         )
-        db.save_message(q.session_id, "user", q.question)
+        db.save_message(q.session_id, "user", q.question, is_voice=q.is_voice)
         db.save_message(
             q.session_id, "assistant", result["reply"], result.get("sources", [])
         )
@@ -208,3 +228,116 @@ def ask_endpoint(request: Request, q: Question):
                 "error": True,
             },
         )
+
+
+@app.get("/admin/stats")
+def admin_stats(password: str):
+    """
+    Admin dashboard statistics endpoint.
+
+    Args:
+        password: Simple password protection (check via query param)
+
+    Returns:
+        JSON with user stats, top schemes, recent questions
+    """
+    # Simple password check
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "yojana_admin_2026")
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    try:
+        with db._conn() as conn:
+            cursor = conn.cursor()
+
+            # Total users
+            cursor.execute("SELECT COUNT(DISTINCT session_id) FROM sessions")
+            total_users = cursor.fetchone()[0] or 0
+
+            # Total questions
+            cursor.execute("SELECT COUNT(*) FROM messages WHERE role = 'user'")
+            total_questions = cursor.fetchone()[0] or 0
+
+            # Today's users (last 24 hours)
+            cursor.execute("""
+                SELECT COUNT(DISTINCT session_id)
+                FROM messages
+                WHERE role = 'user'
+                AND datetime(timestamp) > datetime('now', '-1 day')
+            """)
+            today_users = cursor.fetchone()[0] or 0
+
+            # Voice interaction stats
+            cursor.execute("SELECT COUNT(*) FROM messages WHERE role = 'user' AND is_voice = 1")
+            total_voice_questions = cursor.fetchone()[0] or 0
+
+            # Average questions per user
+            avg_questions = round(total_questions / total_users, 1) if total_users > 0 else 0
+
+            # Top schemes from sources
+            cursor.execute("""
+                SELECT sources
+                FROM messages
+                WHERE role = 'assistant' AND sources IS NOT NULL AND sources != '[]'
+                LIMIT 1000
+            """)
+
+            scheme_counts = {}
+            for row in cursor.fetchall():
+                try:
+                    sources = json.loads(row[0])
+                    for source in sources:
+                        name = source.get("name", "Unknown")
+                        scheme_counts[name] = scheme_counts.get(name, 0) + 1
+                except:
+                    pass
+
+            top_schemes = sorted(scheme_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+
+            # Recent questions (last 20)
+            cursor.execute("""
+                SELECT m.session_id, m.content, m.created_at, s.profile, m.is_voice
+                FROM messages m
+                LEFT JOIN sessions s ON m.session_id = s.session_id
+                WHERE m.role = 'user'
+                ORDER BY m.id DESC
+                LIMIT 20
+            """)
+
+            recent_questions = []
+            for row in cursor.fetchall():
+                session_id, content, created_at, profile_json, is_voice = row
+                try:
+                    profile = json.loads(profile_json) if profile_json else {}
+                except:
+                    profile = {}
+
+                recent_questions.append({
+                    "session_id": session_id[:8],  # Short ID for privacy
+                    "question": content[:100],  # Truncate long questions
+                    "timestamp": str(created_at),
+                    "is_voice": bool(is_voice),
+                    "profile": {
+                        "age": profile.get("age"),
+                        "occupation": profile.get("occupation")
+                    }
+                })
+
+            return {
+                "overview": {
+                    "total_users": total_users,
+                    "total_questions": total_questions,
+                    "today_users": today_users,
+                    "total_voice_questions": total_voice_questions,
+                    "avg_questions_per_user": avg_questions
+                },
+                "top_schemes": [
+                    {"name": name, "count": count, "percentage": round(count/total_questions*100, 1) if total_questions > 0 else 0}
+                    for name, count in top_schemes
+                ],
+                "recent_questions": recent_questions,
+                "timestamp": time.time()
+            }
+    except Exception as e:
+        logger.error(f"Admin stats error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to fetch stats")

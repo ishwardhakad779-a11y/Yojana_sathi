@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YojanaSaathi - Admin Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["DM Sans", "sans-serif"],
+                    },
+                    colors: {
+                        navy: {
+                            50: "#eef5fb",
+                            100: "#dcebf6",
+                            600: "#125580",
+                            700: "#10466b",
+                            800: "#0d3855",
+                            900: "#092b42",
+                        },
+                        saffron: "#f28c28",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full border border-gray-100">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-navy-50 text-navy-600 rounded-xl mb-3">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-navy-900">Admin Portal</h1>
+                <p class="text-sm text-gray-500 mt-1">YojanaSaathi Dashboard access kijiye</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Password</label>
+                    <input type="password" id="passwordInput" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-navy-600 text-sm" placeholder="Admin password darj karein" required>
+                </div>
+                <div id="loginError" class="text-red-500 text-xs text-center hidden">Incorrect password. Dobara koshish karein.</div>
+                <button type="submit" class="w-full bg-navy-600 hover:bg-navy-700 text-white font-medium py-3 rounded-xl transition-all shadow-md">
+                    Login Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden">
+        <!-- Top Navbar -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-navy-600 text-white p-2 rounded-lg">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-navy-900 leading-tight">YojanaSaathi Admin</h1>
+                        <span class="text-xs text-gray-500">Live Analytics & User Logs</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="fetchStats()" class="p-2 text-gray-600 hover:text-navy-600 hover:bg-navy-50 rounded-lg transition-all" title="Refresh Data">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="logout()" class="flex items-center gap-2 text-xs font-semibold text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-all">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Total Users -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Users</p>
+                            <h3 id="statTotalUsers" class="text-2xl font-bold text-navy-900 mt-2">--</h3>
+                        </div>
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400 mt-4 block">Unique Session Count</span>
+                </div>
+
+                <!-- Total Questions -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Questions</p>
+                            <h3 id="statTotalQuestions" class="text-2xl font-bold text-navy-900 mt-2">--</h3>
+                        </div>
+                        <div class="p-3 bg-green-50 text-green-600 rounded-xl">
+                            <i data-lucide="message-square" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400 mt-4 block">Overall queries asked</span>
+                </div>
+
+                <!-- Mic / Voice Interactions -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Voice Usage (Mic)</p>
+                            <h3 id="statVoiceQuestions" class="text-2xl font-bold text-saffron mt-2">--</h3>
+                        </div>
+                        <div class="p-3 bg-orange-50 text-saffron rounded-xl">
+                            <i data-lucide="mic" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400 mt-4 block">Speech-to-Text inputs</span>
+                </div>
+
+                <!-- Active Today -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Active Today</p>
+                            <h3 id="statTodayUsers" class="text-2xl font-bold text-navy-900 mt-2">--</h3>
+                        </div>
+                        <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                            <i data-lucide="zap" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <span class="text-xs text-gray-400 mt-4 block">Last 24 Hours</span>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Top Schemes & Recent Questions -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Top Schemes (1 col) -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <h2 class="text-base font-bold text-navy-900 mb-4 flex items-center gap-2">
+                        <i data-lucide="award" class="w-5 h-5 text-saffron"></i> Most Searched Schemes
+                    </h2>
+                    <div id="topSchemesList" class="space-y-4">
+                        <p class="text-xs text-gray-400">Loading data...</p>
+                    </div>
+                </div>
+
+                <!-- Recent Questions Log (2 cols) -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                    <h2 class="text-base font-bold text-navy-900 mb-4 flex items-center gap-2">
+                        <i data-lucide="clock" class="w-5 h-5 text-navy-600"></i> Recent User Questions
+                    </h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-50 text-gray-500 font-semibold uppercase border-b border-gray-100">
+                                <tr>
+                                    <th class="py-3 px-4">Session</th>
+                                    <th class="py-3 px-4">Type</th>
+                                    <th class="py-3 px-4">Question</th>
+                                    <th class="py-3 px-4">Profile</th>
+                                    <th class="py-3 px-4">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentQuestionsTable" class="divide-y divide-gray-100 text-gray-700">
+                                <tr>
+                                    <td colspan="5" class="py-4 text-center text-gray-400">Loading queries...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let adminPassword = localStorage.getItem("admin_password") || "";
+
+        function checkAuth() {
+            if (adminPassword) {
+                fetchStats();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById("loginScreen").classList.remove("hidden");
+            document.getElementById("dashboard").classList.add("hidden");
+        }
+
+        function showDashboard() {
+            document.getElementById("loginScreen").classList.add("hidden");
+            document.getElementById("dashboard").classList.remove("hidden");
+            lucide.createIcons();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const pwd = document.getElementById("passwordInput").value;
+            adminPassword = pwd;
+            const success = await fetchStats();
+            if (success) {
+                localStorage.setItem("admin_password", pwd);
+            } else {
+                document.getElementById("loginError").classList.remove("hidden");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("admin_password");
+            adminPassword = "";
+            showLogin();
+        }
+
+        async function fetchStats() {
+            try {
+                const res = await fetch(`/admin/stats?password=${encodeURIComponent(adminPassword)}`);
+                if (!res.ok) {
+                    showLogin();
+                    return false;
+                }
+                const data = await res.json();
+                renderStats(data);
+                showDashboard();
+                return true;
+            } catch (err) {
+                console.error("Failed to fetch stats:", err);
+                return false;
+            }
+        }
+
+        function renderStats(data) {
+            // Overview stats
+            document.getElementById("statTotalUsers").innerText = data.overview.total_users || 0;
+            document.getElementById("statTotalQuestions").innerText = data.overview.total_questions || 0;
+            document.getElementById("statVoiceQuestions").innerText = data.overview.total_voice_questions || 0;
+            document.getElementById("statTodayUsers").innerText = data.overview.today_users || 0;
+
+            // Top Schemes
+            const schemesContainer = document.getElementById("topSchemesList");
+            if (!data.top_schemes || data.top_schemes.length === 0) {
+                schemesContainer.innerHTML = `<p class="text-xs text-gray-400">Abhi tak koi search stats nahi hain.</p>`;
+            } else {
+                schemesContainer.innerHTML = data.top_schemes.map((s, idx) => `
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span class="text-gray-700">${idx + 1}. ${s.name}</span>
+                            <span class="text-navy-600">${s.count} hits (${s.percentage}%)</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                            <div class="bg-saffron h-1.5 rounded-full" style="width: ${s.percentage}%"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Recent Questions
+            const tableBody = document.getElementById("recentQuestionsTable");
+            if (!data.recent_questions || data.recent_questions.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-gray-400">Koi recent log nahi mila.</td></tr>`;
+            } else {
+                tableBody.innerHTML = data.recent_questions.map(q => {
+                    const profileBadge = q.profile && (q.profile.age || q.profile.occupation)
+                        ? `<span class="bg-navy-50 text-navy-600 px-2 py-0.5 rounded text-[10px] font-medium">${q.profile.age || ''} ${q.profile.occupation || ''}</span>`
+                        : `<span class="text-gray-300">-</span>`;
+
+                    const voiceBadge = q.is_voice
+                        ? `<span class="bg-orange-50 text-saffron px-2 py-0.5 rounded text-[10px] font-medium flex items-center gap-1 w-fit"><i data-lucide="mic" class="w-3 h-3"></i> Mic</span>`
+                        : `<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-medium w-fit">Text</span>`;
+
+                    return `
+                        <tr class="hover:bg-gray-50/50">
+                            <td class="py-3 px-4 font-mono text-gray-400">${q.session_id}</td>
+                            <td class="py-3 px-4">${voiceBadge}</td>
+                            <td class="py-3 px-4 font-medium text-gray-800">${escapeHtml(q.question)}</td>
+                            <td class="py-3 px-4">${profileBadge}</td>
+                            <td class="py-3 px-4 text-gray-400 text-[11px]">${q.timestamp ? q.timestamp.split('.')[0] : '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            lucide.createIcons();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Initialize check on page load
+        checkAuth();
+    </script>
+</body>
+</html>

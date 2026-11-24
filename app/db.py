@@ -121,6 +121,7 @@ def init_db():
                 role       TEXT NOT NULL,
                 content    TEXT NOT NULL,
                 sources    TEXT NOT NULL DEFAULT '[]',
+                is_voice   BOOLEAN NOT NULL DEFAULT 0,
                 created_at TIMESTAMP NOT NULL DEFAULT {now}
             )
             """,
@@ -129,6 +130,18 @@ def init_db():
             c,
             "CREATE INDEX IF NOT EXISTS idx_messages_session ON messages (session_id, id)",
         )
+
+        # Migration: add is_voice column if it doesn't exist (for pre-existing DBs)
+        if not USE_PG:
+            cols = [row[1] for row in _run(c, "PRAGMA table_info(messages)").fetchall()]
+            if "is_voice" not in cols:
+                _run(c, "ALTER TABLE messages ADD COLUMN is_voice BOOLEAN NOT NULL DEFAULT 0")
+                logger.info("Migrated messages table: added is_voice column")
+        else:
+            cols = [row[0] for row in _run(c, "SELECT column_name FROM information_schema.columns WHERE table_name = 'messages'").fetchall()]
+            if "is_voice" not in cols:
+                _run(c, "ALTER TABLE messages ADD COLUMN is_voice BOOLEAN NOT NULL DEFAULT FALSE")
+                logger.info("Migrated messages table: added is_voice column")
     logger.info(f"Database ready: {'Postgres' if USE_PG else f'SQLite ({SQLITE_PATH})'}")
 
 
@@ -179,12 +192,12 @@ def save_session(session_id: str, profile: dict, intent: str, topic: str):
         )
 
 
-def save_message(session_id: str, role: str, content: str, sources=None):
+def save_message(session_id: str, role: str, content: str, sources=None, is_voice: bool = False):
     with _conn() as c:
         _run(
             c,
-            "INSERT INTO messages (session_id, role, content, sources) VALUES (?, ?, ?, ?)",
-            (session_id, role, content, json.dumps(sources or [], ensure_ascii=False)),
+            "INSERT INTO messages (session_id, role, content, sources, is_voice) VALUES (?, ?, ?, ?, ?)",
+            (session_id, role, content, json.dumps(sources or [], ensure_ascii=False), int(is_voice)),
         )
 
 
