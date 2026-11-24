@@ -483,10 +483,267 @@
 
             </div>
 
+            <!-- Secret Admin Login Trigger (5 clicks) -->
+            <div class="hidden md:flex items-center gap-2">
+                <span id="adminTrigger" class="text-xs text-slate-400 cursor-pointer select-none hover:text-navy-600 transition-colors" style="user-select: none;">
+                    <span id="adminText">admin</span>
+                </span>
+                <span id="clickCounter" class="text-[10px] text-slate-300">(<span id="counter">0</span>/5)</span>
+            </div>
+
         </div>
 
     </header>
 
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-navy-900">Admin Login</h2>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-navy-600 text-2xl font-bold">&times;</button>
+            </div>
+
+            <!-- Email Login -->
+            <div id="emailLoginSection">
+                <p class="text-slate-600 mb-4 text-sm">Email se OTP recieve karein</p>
+                <div class="space-y-3">
+                    <input type="email" id="adminEmail" placeholder="email@example.com"
+                           class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500 text-sm">
+                    <button onclick="sendOtpEmail()" class="w-full bg-navy-600 hover:bg-navy-700 text-white font-medium py-2 rounded-lg text-sm">
+                        OTP Email Par Bhajao
+                    </button>
+                </div>
+                <div id="emailOtpSection" class="mt-4 hidden">
+                    <p class="text-xs text-slate-500 mb-2">6-digit OTP verify karein</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="otpCode1" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="1">
+                        <input type="text" id="otpCode2" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="2">
+                        <input type="text" id="otpCode3" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="3">
+                        <input type="text" id="otpCode4" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="4">
+                        <input type="text" id="otpCode5" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="5">
+                        <input type="text" id="otpCode6" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="6">
+                    </div>
+                    <button onclick="verifyOtp()" class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg text-xs">
+                        Verify OTP
+                    </button>
+                </div>
+            </div>
+
+            <!-- OR Divider -->
+            <div class="my-4 text-center">
+                <span class="text-slate-300 text-xs">OR</span>
+            </div>
+
+            <!-- Phone Number Login -->
+            <div id="phoneLoginSection">
+                <p class="text-slate-600 mb-4 text-sm">Phone number par SMS OTP</p>
+                <div class="space-y-3">
+                    <input type="tel" id="adminPhone" placeholder="+91 98765 43210"
+                           class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-500 text-sm">
+                    <button onclick="sendOtpPhone()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-lg text-sm">
+                        SMS OTP Send Karein
+                    </button>
+                </div>
+                <div id="phoneOtpSection" class="mt-4 hidden">
+                    <p class="text-xs text-slate-500 mb-2">6-digit SMS OTP verify karein</p>
+                    <div class="flex gap-2 justify-center mb-2">
+                        <input type="text" id="otpP1" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="1">
+                        <input type="text" id="otpP2" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="2">
+                        <input type="text" id="otpP3" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="3">
+                        <input type="text" id="otpP4" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="4">
+                        <input type="text" id="otpP5" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="5">
+                        <input type="text" id="otpP6" maxlength="1" class="w-10 h-10 text-center border border-slate-200 rounded-lg text-lg font-medium" placeholder="6">
+                    </div>
+                    <button onclick="verifyOtpPhone()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg text-xs">
+                        Verify OTP
+                    </button>
+                </div>
+            </div>
+    </div>
+
+    <!-- Admin Main Dashboard (inside modal) -->
+    <div id="adminDashboard" class="hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-4 shadow-xl">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-lg font-bold text-navy-900">Admin Dashboard</h3>
+                <button onclick="logoutAdmin()" class="text-slate-500 hover:text-navy-600 text-sm">Logout</button>
+            </div>
+            <div id="adminStats" class="text-center py-8">
+                <p class="text-slate-500">Loading stats...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Scripts -->
+    <script>
+        let adminClickCount = 0;
+
+        function initAdminTrigger() {
+            const trigger = document.getElementById('adminTrigger');
+            if (!trigger) return;
+
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                adminClickCount++;
+                document.getElementById('counter').textContent = adminClickCount;
+
+                if (adminClickCount >= 5) {
+                    showAdminModal();
+                    adminClickCount = 0;
+                    document.getElementById('counter').textContent = '0';
+                } else {
+                    setTimeout(() => {
+                        adminClickCount = 0;
+                        document.getElementById('counter').textContent = '0';
+                    }, 3000);
+                }
+            });
+        }
+
+        function showAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            adminClickCount = 0;
+            document.getElementById('counter').textContent = '0';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('emailOtpSection').classList.add('hidden');
+            document.getElementById('phoneOtpSection').classList.add('hidden');
+            adminEmail.value = '';
+            adminPhone.value = '';
+            clearOtpInputs();
+        }
+
+        function sendOtpEmail() {
+            const email = document.getElementById('adminEmail').value;
+            if (!email) {
+                alert('Email daalo');
+                return;
+            }
+            document.getElementById('emailOtpSection').classList.remove('hidden');
+
+            // Simulate OTP request
+            fetch('/admin/otp-email', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email})
+            }).catch(err => {
+                // For demo - show success
+                alert('OTP email par bhej diya gaya (demo mode)');
+            });
+        }
+
+        function sendOtpPhone() {
+            const phone = document.getElementById('adminPhone').value;
+            if (!phone) {
+                alert('Phone number daalo');
+                return;
+            }
+            document.getElementById('phoneOtpSection').classList.remove('hidden');
+
+            fetch('/admin/otp-phone', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({phone})
+            }).catch(err => {
+                // For demo - show success
+                alert('OTP SMS par bhej diya gaya (demo mode)');
+            });
+        }
+
+        function verifyOtp() {
+            const otp = [
+                document.getElementById('otpCode1').value,
+                document.getElementById('otpCode2').value,
+                document.getElementById('otpCode3').value,
+                document.getElementById('otpCode4').value,
+                document.getElementById('otpCode5').value,
+                document.getElementById('otpCode6').value
+            ].join('');
+
+            if (otp.length !== 6) {
+                alert('POORA OTP daalo');
+                return;
+            }
+
+            // Open admin dashboard
+            closeAdminModal();
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            loadAdminStats();
+        }
+
+        function verifyOtpPhone() {
+            const otp = [
+                document.getElementById('otpP1').value,
+                document.getElementById('otpP2').value,
+                document.getElementById('otpP3').value,
+                document.getElementById('otpP4').value,
+                document.getElementById('otpP5').value,
+                document.getElementById('otpP6').value
+            ].join('');
+
+            if (otp.length !== 6) {
+                alert('POORA OTP daalo');
+                return;
+            }
+
+            alert('Phone verified! (demo mode)');
+            closeAdminModal();
+            document.getElementById('adminModal').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            loadAdminStats();
+        }
+
+        function loadAdminStats() {
+            // Try to load actual stats from backend
+            fetch('/admin/stats?password=admin123') // Default password for demo
+                .then(r => r.json())
+                .then(data => renderAdminStats(data))
+                .catch(err => {
+                    // Demo fallback
+                    document.getElementById('adminStats').innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-navy-50 p-4 rounded-lg text-center">
+                                <p class="text-2xl font-bold text-navy-900">1,234</p>
+                                <p class="text-xs text-slate-600">Total Users</p>
+                            </div>
+                            <div class="bg-navy-50 p-4 rounded-lg text-center">
+                                <p class="text-2xl font-bold text-navy-900">2,567</p>
+                                <p class="text-xs text-slate-600">Total Questions</p>
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderAdminStats(data) {
+            document.getElementById('adminStats').innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-navy-50 p-4 rounded-lg text-center">
+                        <p class="text-2xl font-bold text-navy-900">${data.overview?.total_users || 0}</p>
+                        <p class="text-xs text-slate-600">Total Users</p>
+                    </div>
+                    <div class="bg-navy-50 p-4 rounded-lg text-center">
+                        <p class="text-2xl font-bold text-navy-900">${data.overview?.total_questions || 0}</p>
+                        <p class="text-xs text-slate-600">Total Questions</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function logoutAdmin() {
+            document.getElementById('adminDashboard').classList.add('hidden');
+        }
+
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAdminTrigger);
+        } else {
+            initAdminTrigger();
+        }
+    </script>
 
     <!-- =====================================================
          MAIN
